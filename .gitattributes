@@ -2,5 +2,7 @@
 *.jpg binary
 *.png binary
 *.mp4 binary
+*.webp binary
+*.avif binary
 *.exe binary
 *.svg text eol=lf

@@ -32,6 +32,10 @@ body{
 }
 a{color:inherit;text-decoration:none}
 img,svg,video{display:block;max-width:100%}
+/* <picture> — только контейнер форматов (avif/webp/jpg); не должен
+   создавать свой бокс, иначе height:100% у картинок считался бы
+   от него, а не от карточки */
+picture{display:contents}
 ::selection{background:#fff;color:#000}
 
 .shell{width:min(1440px,100%);margin-inline:auto;padding-inline:var(--pad)}

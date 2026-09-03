@@ -27,9 +27,12 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter+Tight:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- шрифты грузятся, не блокируя отрисовку: display=swap и так сначала
+     показывает системный шрифт, поэтому ждать этот запрос незачем -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter+Tight:wght@200;300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter+Tight:wght@200;300;400;500;600;700&display=swap"></noscript>
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="preload" as="image" href="assets/poster.jpg">
+<link rel="preload" as="image" href="assets/poster.jpg" fetchpriority="high">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -220,12 +223,12 @@
         <div class="proj">
           <div class="deck-wrap">
             <div class="deck" data-deck>
-            <figure class="card"><img src="assets/work/vartanova/01.jpg" alt="Главный экран" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/vartanova/02.jpg" alt="Услуги" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/vartanova/03.jpg" alt="Форма заявки" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/vartanova/04.jpg" alt="Страница проекта" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/vartanova/05.jpg" alt="Переход между проектами" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/vartanova/06.jpg" alt="Макеты в Figma" width="2000" height="1200" loading="lazy" decoding="async"></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/vartanova/01.avif"><source type="image/webp" srcset="assets/work/vartanova/01.webp"><img src="assets/work/vartanova/01.jpg" alt="Главный экран" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/vartanova/02.avif"><source type="image/webp" srcset="assets/work/vartanova/02.webp"><img src="assets/work/vartanova/02.jpg" alt="Услуги" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/vartanova/03.avif"><source type="image/webp" srcset="assets/work/vartanova/03.webp"><img src="assets/work/vartanova/03.jpg" alt="Форма заявки" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/vartanova/04.avif"><source type="image/webp" srcset="assets/work/vartanova/04.webp"><img src="assets/work/vartanova/04.jpg" alt="Страница проекта" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/vartanova/05.avif"><source type="image/webp" srcset="assets/work/vartanova/05.webp"><img src="assets/work/vartanova/05.jpg" alt="Переход между проектами" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/vartanova/06.avif"><source type="image/webp" srcset="assets/work/vartanova/06.webp"><img src="assets/work/vartanova/06.jpg" alt="Макеты в Figma" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
             </div>
             <div class="deck__bar">
               <p class="deck__caps" aria-live="polite"><span>Главный экран</span><span>Услуги</span><span>Форма заявки</span><span>Страница проекта</span><span>Переход между проектами</span><span>Макеты в Figma</span></p>
@@ -245,11 +248,11 @@
         <div class="proj">
           <div class="deck-wrap">
             <div class="deck" data-deck>
-            <figure class="card"><img src="assets/work/waifu/01.jpg" alt="Главный экран" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/waifu/02.jpg" alt="Процесс" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/waifu/03.jpg" alt="Форматы поставки" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/waifu/04.jpg" alt="Сравнение" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/waifu/05.jpg" alt="Отзывы" width="2000" height="1200" loading="lazy" decoding="async"></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/waifu/01.avif"><source type="image/webp" srcset="assets/work/waifu/01.webp"><img src="assets/work/waifu/01.jpg" alt="Главный экран" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/waifu/02.avif"><source type="image/webp" srcset="assets/work/waifu/02.webp"><img src="assets/work/waifu/02.jpg" alt="Процесс" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/waifu/03.avif"><source type="image/webp" srcset="assets/work/waifu/03.webp"><img src="assets/work/waifu/03.jpg" alt="Форматы поставки" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/waifu/04.avif"><source type="image/webp" srcset="assets/work/waifu/04.webp"><img src="assets/work/waifu/04.jpg" alt="Сравнение" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/waifu/05.avif"><source type="image/webp" srcset="assets/work/waifu/05.webp"><img src="assets/work/waifu/05.jpg" alt="Отзывы" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
             </div>
             <div class="deck__bar">
               <p class="deck__caps" aria-live="polite"><span>Главный экран</span><span>Процесс</span><span>Форматы поставки</span><span>Сравнение</span><span>Отзывы</span></p>
@@ -268,11 +271,11 @@
         <div class="proj">
           <div class="deck-wrap">
             <div class="deck" data-deck>
-            <figure class="card"><img src="assets/work/yasenkeys/01.jpg" alt="Главный экран" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/yasenkeys/02.jpg" alt="Что ты получишь" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/yasenkeys/03.jpg" alt="Каталог кейсов" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/yasenkeys/04.jpg" alt="Страница кейса" width="2000" height="1200" loading="lazy" decoding="async"></figure>
-            <figure class="card"><img src="assets/work/yasenkeys/05.jpg" alt="Админ-панель" width="2000" height="1200" loading="lazy" decoding="async"></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/yasenkeys/01.avif"><source type="image/webp" srcset="assets/work/yasenkeys/01.webp"><img src="assets/work/yasenkeys/01.jpg" alt="Главный экран" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/yasenkeys/02.avif"><source type="image/webp" srcset="assets/work/yasenkeys/02.webp"><img src="assets/work/yasenkeys/02.jpg" alt="Что ты получишь" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/yasenkeys/03.avif"><source type="image/webp" srcset="assets/work/yasenkeys/03.webp"><img src="assets/work/yasenkeys/03.jpg" alt="Каталог кейсов" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/yasenkeys/04.avif"><source type="image/webp" srcset="assets/work/yasenkeys/04.webp"><img src="assets/work/yasenkeys/04.jpg" alt="Страница кейса" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
+            <figure class="card"><picture><source type="image/avif" srcset="assets/work/yasenkeys/05.avif"><source type="image/webp" srcset="assets/work/yasenkeys/05.webp"><img src="assets/work/yasenkeys/05.jpg" alt="Админ-панель" width="2000" height="1200" loading="lazy" decoding="async"></picture></figure>
             </div>
             <div class="deck__bar">
               <p class="deck__caps" aria-live="polite"><span>Главный экран</span><span>Что ты получишь</span><span>Каталог кейсов</span><span>Страница кейса</span><span>Админ-панель</span></p>
@@ -300,15 +303,15 @@
         <div class="proj">
           <div class="deck-wrap">
             <div class="fan" data-fan>
-            <figure class="fan__card"><img src="assets/work/goodline/01.jpg" alt="ИИ-навигатор — новая роль человека" width="1080" height="1350" loading="lazy" decoding="async"></figure>
-            <figure class="fan__card"><img src="assets/work/goodline/02.jpg" alt="О женщинах, которые меняли мир" width="1080" height="1350" loading="lazy" decoding="async"></figure>
-            <figure class="fan__card"><img src="assets/work/goodline/03.jpg" alt="ТЗ-конвейер с помощью ИИ" width="1080" height="1350" loading="lazy" decoding="async"></figure>
-            <figure class="fan__card"><img src="assets/work/goodline/04.jpg" alt="IT в 2025 — обложка" width="1080" height="1350" loading="lazy" decoding="async"></figure>
-            <figure class="fan__card"><img src="assets/work/goodline/05.jpg" alt="Как попасть в поезд, который уже едет" width="1080" height="1350" loading="lazy" decoding="async"></figure>
-            <figure class="fan__card"><img src="assets/work/goodline/06.jpg" alt="В 2025 IT живо" width="1080" height="1350" loading="lazy" decoding="async"></figure>
-            <figure class="fan__card"><img src="assets/work/goodline/07.jpg" alt="Как рождается кейс на ЯсенКейсе" width="1080" height="1350" loading="lazy" decoding="async"></figure>
-            <figure class="fan__card"><img src="assets/work/goodline/08.jpg" alt="Упаковка и проверка" width="1080" height="1350" loading="lazy" decoding="async"></figure>
-            <figure class="fan__card"><img src="assets/work/goodline/09.jpg" alt="Финал: проверка кейса сеньором" width="1080" height="1350" loading="lazy" decoding="async"></figure>
+            <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/goodline/01.avif"><source type="image/webp" srcset="assets/work/goodline/01.webp"><img src="assets/work/goodline/01.jpg" alt="ИИ-навигатор — новая роль человека" width="1080" height="1350" loading="lazy" decoding="async"></picture></figure>
+            <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/goodline/02.avif"><source type="image/webp" srcset="assets/work/goodline/02.webp"><img src="assets/work/goodline/02.jpg" alt="О женщинах, которые меняли мир" width="1080" height="1350" loading="lazy" decoding="async"></picture></figure>
+            <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/goodline/03.avif"><source type="image/webp" srcset="assets/work/goodline/03.webp"><img src="assets/work/goodline/03.jpg" alt="ТЗ-конвейер с помощью ИИ" width="1080" height="1350" loading="lazy" decoding="async"></picture></figure>
+            <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/goodline/04.avif"><source type="image/webp" srcset="assets/work/goodline/04.webp"><img src="assets/work/goodline/04.jpg" alt="IT в 2025 — обложка" width="1080" height="1350" loading="lazy" decoding="async"></picture></figure>
+            <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/goodline/05.avif"><source type="image/webp" srcset="assets/work/goodline/05.webp"><img src="assets/work/goodline/05.jpg" alt="Как попасть в поезд, который уже едет" width="1080" height="1350" loading="lazy" decoding="async"></picture></figure>
+            <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/goodline/06.avif"><source type="image/webp" srcset="assets/work/goodline/06.webp"><img src="assets/work/goodline/06.jpg" alt="В 2025 IT живо" width="1080" height="1350" loading="lazy" decoding="async"></picture></figure>
+            <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/goodline/07.avif"><source type="image/webp" srcset="assets/work/goodline/07.webp"><img src="assets/work/goodline/07.jpg" alt="Как рождается кейс на ЯсенКейсе" width="1080" height="1350" loading="lazy" decoding="async"></picture></figure>
+            <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/goodline/08.avif"><source type="image/webp" srcset="assets/work/goodline/08.webp"><img src="assets/work/goodline/08.jpg" alt="Упаковка и проверка" width="1080" height="1350" loading="lazy" decoding="async"></picture></figure>
+            <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/goodline/09.avif"><source type="image/webp" srcset="assets/work/goodline/09.webp"><img src="assets/work/goodline/09.jpg" alt="Финал: проверка кейса сеньором" width="1080" height="1350" loading="lazy" decoding="async"></picture></figure>
             </div>
             <div class="deck__bar">
               <p class="deck__caps" aria-live="polite"><span>Обложки и анонсы</span><span>Карусель об ИТ-рынке</span><span>Серия о платформе</span></p>
@@ -330,10 +333,10 @@
 
       <article class="case reveal" id="w3">
     <div class="cover" data-parallax>
-      <img class="cover__img" src="assets/work/pngtube/cover-2400.jpg"
+      <picture><source type="image/avif" srcset="assets/work/pngtube/cover-2400.avif"><source type="image/webp" srcset="assets/work/pngtube/cover-2400.webp"><img class="cover__img" src="assets/work/pngtube/cover-2400.jpg"
            srcset="assets/work/pngtube/cover-1200.jpg 1200w, assets/work/pngtube/cover-2400.jpg 2400w"
            sizes="100vw" alt="Иконка PNGTube Studio среди руин"
-           width="2400" height="1446" loading="lazy" decoding="async">
+           width="2400" height="1446" loading="lazy" decoding="async"></picture>
       <p class="cover__title">PNGTube Studio</p>
     </div>
 
@@ -371,31 +374,31 @@
 
               <div class="stage is-on">
                 <div class="fan fan--wide" data-fan data-fan-step="1">
-                  <figure class="fan__card"><img src="assets/work/content/preview-01.jpg" alt="Превью для ролика «1 vs 100»" width="1920" height="1080" loading="lazy" decoding="async"></figure>
-                  <figure class="fan__card"><img src="assets/work/content/preview-02.jpg" alt="Превью для ролика DeadVR" width="1920" height="1080" loading="lazy" decoding="async"></figure>
-                  <figure class="fan__card"><img src="assets/work/content/preview-03.jpg" alt="Превью для ролика с ночным лагерем" width="1920" height="1080" loading="lazy" decoding="async"></figure>
-                  <figure class="fan__card"><img src="assets/work/content/preview-04.jpg" alt="Превью для ролика про пиратов и кракена" width="1920" height="1080" loading="lazy" decoding="async"></figure>
-                  <figure class="fan__card"><img src="assets/work/content/preview-05.jpg" alt="Превью для ролика «100К метров»" width="1920" height="1080" loading="lazy" decoding="async"></figure>
-                  <figure class="fan__card"><img src="assets/work/content/preview-06.jpg" alt="Превью для ролика «9999 день»" width="1920" height="1080" loading="lazy" decoding="async"></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/preview-01.avif"><source type="image/webp" srcset="assets/work/content/preview-01.webp"><img src="assets/work/content/preview-01.jpg" alt="Превью для ролика «1 vs 100»" width="1920" height="1080" loading="lazy" decoding="async"></picture></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/preview-02.avif"><source type="image/webp" srcset="assets/work/content/preview-02.webp"><img src="assets/work/content/preview-02.jpg" alt="Превью для ролика DeadVR" width="1920" height="1080" loading="lazy" decoding="async"></picture></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/preview-03.avif"><source type="image/webp" srcset="assets/work/content/preview-03.webp"><img src="assets/work/content/preview-03.jpg" alt="Превью для ролика с ночным лагерем" width="1920" height="1080" loading="lazy" decoding="async"></picture></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/preview-04.avif"><source type="image/webp" srcset="assets/work/content/preview-04.webp"><img src="assets/work/content/preview-04.jpg" alt="Превью для ролика про пиратов и кракена" width="1920" height="1080" loading="lazy" decoding="async"></picture></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/preview-05.avif"><source type="image/webp" srcset="assets/work/content/preview-05.webp"><img src="assets/work/content/preview-05.jpg" alt="Превью для ролика «100К метров»" width="1920" height="1080" loading="lazy" decoding="async"></picture></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/preview-06.avif"><source type="image/webp" srcset="assets/work/content/preview-06.webp"><img src="assets/work/content/preview-06.jpg" alt="Превью для ролика «9999 день»" width="1920" height="1080" loading="lazy" decoding="async"></picture></figure>
                 </div>
               </div>
 
               <div class="stage">
                 <div class="fan fan--square" data-fan data-fan-step="1">
-                  <figure class="fan__card"><img src="assets/work/content/post-01.jpg" alt="Пост про GTA 6" width="1080" height="1080" loading="lazy" decoding="async"></figure>
-                  <figure class="fan__card"><img src="assets/work/content/post-02.jpg" alt="Розыгрыш Grand Theft Auto VI" width="1080" height="1080" loading="lazy" decoding="async"></figure>
-                  <figure class="fan__card"><img src="assets/work/content/post-03.jpg" alt="ARC Raiders — обновление Frozen Trail" width="1080" height="1080" loading="lazy" decoding="async"></figure>
-                  <figure class="fan__card"><img src="assets/work/content/post-04.jpg" alt="Bodycam — большое обновление" width="1080" height="1080" loading="lazy" decoding="async"></figure>
-                  <figure class="fan__card"><img src="assets/work/content/post-05.jpg" alt="Stranded Deep 2 в разработке" width="1080" height="1080" loading="lazy" decoding="async"></figure>
-                  <figure class="fan__card"><img src="assets/work/content/post-06.jpg" alt="Мультиплеер S.T.A.L.K.E.R. 2" width="1080" height="1080" loading="lazy" decoding="async"></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/post-01.avif"><source type="image/webp" srcset="assets/work/content/post-01.webp"><img src="assets/work/content/post-01.jpg" alt="Пост про GTA 6" width="1080" height="1080" loading="lazy" decoding="async"></picture></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/post-02.avif"><source type="image/webp" srcset="assets/work/content/post-02.webp"><img src="assets/work/content/post-02.jpg" alt="Розыгрыш Grand Theft Auto VI" width="1080" height="1080" loading="lazy" decoding="async"></picture></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/post-03.avif"><source type="image/webp" srcset="assets/work/content/post-03.webp"><img src="assets/work/content/post-03.jpg" alt="ARC Raiders — обновление Frozen Trail" width="1080" height="1080" loading="lazy" decoding="async"></picture></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/post-04.avif"><source type="image/webp" srcset="assets/work/content/post-04.webp"><img src="assets/work/content/post-04.jpg" alt="Bodycam — большое обновление" width="1080" height="1080" loading="lazy" decoding="async"></picture></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/post-05.avif"><source type="image/webp" srcset="assets/work/content/post-05.webp"><img src="assets/work/content/post-05.jpg" alt="Stranded Deep 2 в разработке" width="1080" height="1080" loading="lazy" decoding="async"></picture></figure>
+                  <figure class="fan__card"><picture><source type="image/avif" srcset="assets/work/content/post-06.avif"><source type="image/webp" srcset="assets/work/content/post-06.webp"><img src="assets/work/content/post-06.jpg" alt="Мультиплеер S.T.A.L.K.E.R. 2" width="1080" height="1080" loading="lazy" decoding="async"></picture></figure>
                 </div>
               </div>
 
               <div class="stage">
                 <div class="slide slide--fit" data-slide>
-              <figure class="slide__card slide__card--bare"><img src="assets/work/content/stat-01.jpg" alt="Просмотры по форматам: 10,1 млн на Shorts" loading="lazy" decoding="async"></figure>
-              <figure class="slide__card slide__card--bare"><img src="assets/work/content/stat-02.jpg" alt="Показы обложек 15,5 млн, CTR 8,2 %" loading="lazy" decoding="async"></figure>
-              <figure class="slide__card slide__card--bare"><img src="assets/work/content/stat-03.jpg" alt="Подписчики по форматам" loading="lazy" decoding="async"></figure>
+              <figure class="slide__card slide__card--bare"><picture><source type="image/avif" srcset="assets/work/content/stat-01.avif"><source type="image/webp" srcset="assets/work/content/stat-01.webp"><img src="assets/work/content/stat-01.jpg" alt="Просмотры по форматам: 10,1 млн на Shorts" loading="lazy" decoding="async"></picture></figure>
+              <figure class="slide__card slide__card--bare"><picture><source type="image/avif" srcset="assets/work/content/stat-02.avif"><source type="image/webp" srcset="assets/work/content/stat-02.webp"><img src="assets/work/content/stat-02.jpg" alt="Показы обложек 15,5 млн, CTR 8,2 %" loading="lazy" decoding="async"></picture></figure>
+              <figure class="slide__card slide__card--bare"><picture><source type="image/avif" srcset="assets/work/content/stat-03.avif"><source type="image/webp" srcset="assets/work/content/stat-03.webp"><img src="assets/work/content/stat-03.jpg" alt="Подписчики по форматам" loading="lazy" decoding="async"></picture></figure>
                 </div>
               </div>
 
@@ -424,8 +427,8 @@
 
         <section class="award">
           <div class="combo combo--hack">
-            <figure class="combo__item"><img src="assets/work/awards/hack-01.jpg" alt="Диплом «Лучший дизайнер», «Моя профессия — ИТ 2023»" width="960" height="1280" loading="lazy" decoding="async"></figure>
-            <figure class="combo__item"><img src="assets/work/awards/hack-02.jpg" alt="Диплом «Лучший дизайнер», «Моя профессия — ИТ» 24/25" width="960" height="1280" loading="lazy" decoding="async"></figure>
+            <figure class="combo__item"><picture><source type="image/avif" srcset="assets/work/awards/hack-01.avif"><source type="image/webp" srcset="assets/work/awards/hack-01.webp"><img src="assets/work/awards/hack-01.jpg" alt="Диплом «Лучший дизайнер», «Моя профессия — ИТ 2023»" width="960" height="1280" loading="lazy" decoding="async"></picture></figure>
+            <figure class="combo__item"><picture><source type="image/avif" srcset="assets/work/awards/hack-02.avif"><source type="image/webp" srcset="assets/work/awards/hack-02.webp"><img src="assets/work/awards/hack-02.jpg" alt="Диплом «Лучший дизайнер», «Моя профессия — ИТ» 24/25" width="960" height="1280" loading="lazy" decoding="async"></picture></figure>
           </div>
           <div class="award__body">
             <h4 class="award__title">Лучший дизайнер — два года подряд</h4>
@@ -435,9 +438,9 @@
 
         <section class="award">
           <div class="combo combo--chicko">
-            <figure class="combo__item"><img src="assets/work/awards/chicko-03.jpg" alt="Упаковка Chicko: стакан и супницы" width="1280" height="1137" loading="lazy" decoding="async"></figure>
-            <figure class="combo__item"><img src="assets/work/awards/chicko-02.jpg" alt="Упаковка Chicko: пакет, стакан и коробки" width="1280" height="1208" loading="lazy" decoding="async"></figure>
-            <figure class="combo__item"><img src="assets/work/awards/chicko-01.jpg" alt="Грамота за участие в конкурсе упаковки Chicko" width="842" height="1190" loading="lazy" decoding="async"></figure>
+            <figure class="combo__item"><picture><source type="image/avif" srcset="assets/work/awards/chicko-03.avif"><source type="image/webp" srcset="assets/work/awards/chicko-03.webp"><img src="assets/work/awards/chicko-03.jpg" alt="Упаковка Chicko: стакан и супницы" width="1280" height="1137" loading="lazy" decoding="async"></picture></figure>
+            <figure class="combo__item"><picture><source type="image/avif" srcset="assets/work/awards/chicko-02.avif"><source type="image/webp" srcset="assets/work/awards/chicko-02.webp"><img src="assets/work/awards/chicko-02.jpg" alt="Упаковка Chicko: пакет, стакан и коробки" width="1280" height="1208" loading="lazy" decoding="async"></picture></figure>
+            <figure class="combo__item"><picture><source type="image/avif" srcset="assets/work/awards/chicko-01.avif"><source type="image/webp" srcset="assets/work/awards/chicko-01.webp"><img src="assets/work/awards/chicko-01.jpg" alt="Грамота за участие в конкурсе упаковки Chicko" width="842" height="1190" loading="lazy" decoding="async"></picture></figure>
           </div>
           <div class="award__body">
             <h4 class="award__title">Chicko — дизайн упаковки <span class="award__badge">Победитель творческого конкурса</span></h4>
@@ -447,9 +450,9 @@
 
         <section class="award">
           <div class="combo combo--reviews">
-            <figure class="combo__item"><img src="assets/work/awards/reviews-card.jpg" alt="Итоги конкурса и благодарность аудитории" width="1140" height="1546" loading="lazy" decoding="async"></figure>
-            <figure class="combo__item"><img src="assets/work/awards/reviews-left.jpg" alt="Комментарии под конкурсом Chicko" width="1280" height="1178" loading="lazy" decoding="async"></figure>
-            <figure class="combo__item"><img src="assets/work/awards/reviews-right.jpg" alt="Комментарии под конкурсом Chicko" width="1280" height="1178" loading="lazy" decoding="async"></figure>
+            <figure class="combo__item"><picture><source type="image/avif" srcset="assets/work/awards/reviews-card.avif"><source type="image/webp" srcset="assets/work/awards/reviews-card.webp"><img src="assets/work/awards/reviews-card.jpg" alt="Итоги конкурса и благодарность аудитории" width="1140" height="1546" loading="lazy" decoding="async"></picture></figure>
+            <figure class="combo__item"><picture><source type="image/avif" srcset="assets/work/awards/reviews-left.avif"><source type="image/webp" srcset="assets/work/awards/reviews-left.webp"><img src="assets/work/awards/reviews-left.jpg" alt="Комментарии под конкурсом Chicko" width="1280" height="1178" loading="lazy" decoding="async"></picture></figure>
+            <figure class="combo__item"><picture><source type="image/avif" srcset="assets/work/awards/reviews-right.avif"><source type="image/webp" srcset="assets/work/awards/reviews-right.webp"><img src="assets/work/awards/reviews-right.jpg" alt="Комментарии под конкурсом Chicko" width="1280" height="1178" loading="lazy" decoding="async"></picture></figure>
           </div>
           <div class="award__body">
             <h4 class="award__title">Отзывы и реакция</h4>
