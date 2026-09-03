@@ -1,0 +1,1446 @@
+/* ══════════════════════════════════════════════════════════════
+   LUXENY — portfolio
+   ══════════════════════════════════════════════════════════════ */
+
+:root{
+  --black:#000000;
+  --line:rgba(255,255,255,.10);
+  --white:#ffffff;
+  --mute:rgba(255,255,255,.52);
+  --mute-2:rgba(255,255,255,.34);
+  --ff:"Inter Tight","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --ff-display:"DM Serif Display",Georgia,"Times New Roman",serif;
+
+  --nav-h:clamp(64px,5.4vw,108px);
+  --pad:clamp(24px,6.6vw,150px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --lift:clamp(84px,10vw,132px);   /* воздух над колодой и вокруг главы */
+  --r-card:clamp(9px,.75vw,14px); /* скругление у всех карточек с картинками */
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--black);
+  color:var(--white);
+  font-family:var(--ff);
+  font-weight:300;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+img,svg,video{display:block;max-width:100%}
+::selection{background:#fff;color:#000}
+
+.shell{width:min(1440px,100%);margin-inline:auto;padding-inline:var(--pad)}
+
+/* ── HEADER: полностью прозрачный, без фона ─────────────────── */
+.nav{
+  position:fixed;inset:0 0 auto 0;z-index:50;
+  height:var(--nav-h);
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  padding-inline:var(--pad);
+  background:transparent;              /* без подложки */
+  pointer-events:none;
+}
+.nav > *{pointer-events:auto}
+/* пока идёт герой — шапка совсем прозрачная; ниже под неё уезжает текст,
+   поэтому включаем мягкое затемнение (не подложку, а градиент в ноль) */
+.nav::before{
+  content:"";position:absolute;inset:0 0 auto 0;
+  height:calc(var(--nav-h) * 2);
+  background:linear-gradient(180deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,.74) 40%,rgba(0,0,0,0) 100%);
+  opacity:0;pointer-events:none;z-index:-1;
+  transition:opacity .5s var(--ease);
+}
+.nav--scrim::before{opacity:1}
+
+.nav__logo{
+  grid-column:1;justify-self:start;
+  display:flex;align-items:center;
+  color:rgba(255,255,255,.92);
+  filter:drop-shadow(0 1px 14px rgba(0,0,0,.6));
+  transition:color .35s var(--ease);
+}
+.nav__mark{width:clamp(40px,3.1vw,64px);opacity:.92;transition:opacity .35s var(--ease),transform .5s var(--ease)}
+.nav__mark svg{width:100%;height:auto;display:block}
+.nav__logo:hover{color:#fff}
+.nav__logo:hover .nav__mark{opacity:1;transform:translateY(-1px)}
+
+.nav__menu{
+  grid-column:2;justify-self:center;
+  display:flex;align-items:center;gap:clamp(18px,2.6vw,40px);
+}
+.nav__menu a{
+  position:relative;
+  font-size:clamp(12.5px,.95vw,17px);font-weight:300;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(255,255,255,.78);
+  text-shadow:0 1px 16px rgba(0,0,0,.5);
+  transition:color .35s var(--ease);
+}
+.nav__menu a::after{
+  content:"";position:absolute;left:0;right:0;bottom:-7px;height:1px;
+  background:currentColor;transform:scaleX(0);transform-origin:right;
+  transition:transform .45s var(--ease);
+}
+.nav__menu a:hover{color:#fff}
+.nav__menu a:hover::after{transform:scaleX(1);transform-origin:left}
+
+.nav__cta{
+  grid-column:3;justify-self:end;
+  font-size:clamp(12px,.9vw,16px);letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(255,255,255,.8);
+  padding:clamp(9px,.7vw,14px) clamp(18px,1.5vw,30px);
+  border:1px solid var(--line);border-radius:999px;
+  backdrop-filter:blur(2px);
+  transition:border-color .4s var(--ease),color .4s var(--ease);
+}
+.nav__cta:hover{border-color:rgba(255,255,255,.45);color:#fff}
+
+.nav__burger{
+  display:none;grid-column:-2;justify-self:end;
+  width:40px;height:40px;padding:0;border:0;background:none;cursor:pointer;
+  position:relative;
+}
+.nav__burger span{
+  position:absolute;left:9px;width:22px;height:1px;background:#fff;
+  transition:transform .4s var(--ease),opacity .3s;
+}
+.nav__burger span:nth-child(1){top:17px}
+.nav__burger span:nth-child(2){top:23px}
+.nav__burger[aria-expanded="true"] span:nth-child(1){transform:translateY(3px) rotate(45deg)}
+.nav__burger[aria-expanded="true"] span:nth-child(2){transform:translateY(-3px) rotate(-45deg)}
+
+.mobile-menu{
+  position:fixed;inset:0;z-index:45;
+  display:flex;flex-direction:column;
+  padding:calc(var(--nav-h) + 16px) var(--pad) calc(env(safe-area-inset-bottom,0px) + 26px);
+  background:rgba(3,4,7,.94);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  overflow-y:auto;
+}
+.mobile-menu[hidden]{display:none}
+/* разделы занимают всё свободное место, контакты остаются внизу */
+.mobile-menu__nav{
+  flex:1;min-height:0;
+  display:flex;flex-direction:column;justify-content:center;gap:2px;
+}
+.mobile-menu__nav a{
+  position:relative;
+  font-size:clamp(30px,9vw,46px);font-weight:200;letter-spacing:.02em;
+  line-height:1.16;
+  padding:10px 0;color:rgba(255,255,255,.9);
+}
+.mobile-menu__foot{
+  flex:none;
+  display:grid;gap:0;
+  border-top:1px solid var(--line);
+  margin-top:clamp(20px,4vh,38px);
+}
+.mobile-menu__link{
+  display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  padding:15px 0;
+  border-bottom:1px solid var(--line);
+}
+.mobile-menu__link span{
+  font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--mute-2);
+}
+.mobile-menu__link b{
+  font-size:16px;font-weight:400;color:#fff;
+}
+
+/* ── HERO ───────────────────────────────────────────────────── */
+.hero{
+  position:relative;
+  height:300vh;                 /* длина прокрутки = длина «плёнки» */
+  background:var(--black);
+}
+.hero__stage{
+  position:sticky;top:0;
+  height:100vh;height:100svh;
+  overflow:hidden;
+  background:var(--black);
+}
+
+.hero__video{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;object-position:50% 50%;
+}
+/* на узких экранах кадр сильно режется — смещаем в сторону героя и планшета */
+@media (max-aspect-ratio:1/1){
+  .hero__video{object-position:66% 50%}
+}
+
+/* кинематографичная подложка: виньетка + затемнение под меню */
+.hero__grade{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(120% 85% at 50% 45%,rgba(0,0,0,0) 42%,rgba(0,0,0,.55) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.42) 0%,rgba(0,0,0,0) 26%,rgba(0,0,0,0) 62%,rgba(0,0,0,.4) 100%);
+}
+/* финальная штора — гарантирует бесшовный стык с чёрной секцией */
+.hero__veil{
+  position:absolute;inset:0;pointer-events:none;
+  background:var(--black);opacity:0;
+}
+
+/* — текст справа — */
+.hero__content{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:flex-start;
+  padding:var(--nav-h) var(--pad) 0;
+  pointer-events:none;
+  will-change:opacity,transform,filter;
+}
+.hero__title-wrap{width:max-content;max-width:100%;text-align:center}
+
+.hero__title{
+  margin:0;
+  font-family:var(--ff-display);
+  font-size:clamp(48px,10.4vw,178px);
+  font-weight:400;              /* DM Serif Display есть только в 400 */
+  line-height:.96;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  text-shadow:0 4px 18px rgba(0,0,0,.5),0 10px 70px rgba(0,0,0,.6);
+}
+.hero__title .ch{
+  display:inline-block;
+  opacity:0;transform:translateY(.42em);
+  filter:blur(10px);
+}
+.is-ready .hero__title .ch{
+  animation:chIn 1.15s var(--ease) forwards;
+  animation-delay:calc(var(--i) * 70ms + 180ms);
+}
+@keyframes chIn{to{opacity:1;transform:none;filter:blur(0)}}
+
+/* — подпись вплотную под заголовком, по центру относительно него — */
+.hero__sub{
+  /* отрицательный отступ: у заголовка под базовой линией остаётся
+     пустое поле строки, без этого подпись визуально не прижмётся */
+  margin:clamp(-18px,-1.1vw,-3px) 0 0;
+  font-size:clamp(10.5px,1.05vw,15.5px);
+  font-weight:300;                /* Inter Tight умеет тонкие начертания */
+  letter-spacing:.28em;
+  text-indent:.28em;              /* компенсируем трекинг при центрировании */
+  text-transform:lowercase;
+  color:rgba(255,255,255,.85);
+  /* только мягкая подложка: жёсткая тень утолщала штрихи */
+  text-shadow:0 2px 26px rgba(0,0,0,.95),0 0 60px rgba(0,0,0,.8);
+  opacity:0;transform:translateY(12px);
+}
+.hero__sub .amp{opacity:.55;padding:0 .04em}
+.is-ready .hero__sub{
+  transition:opacity 1s var(--ease) .95s,transform 1s var(--ease) .95s;
+  opacity:1;transform:none;
+}
+
+/* — цитата, проявляется по словам вместе с видео — */
+.hero__quote{
+  position:absolute;left:var(--pad);bottom:clamp(54px,11vh,104px);
+  margin:0;
+  width:min(38ch,44vw);
+  font-size:clamp(15px,1.42vw,23px);
+  font-weight:300;
+  line-height:1.62;
+  letter-spacing:.012em;
+  color:rgba(255,255,255,.88);
+  text-shadow:0 2px 26px rgba(0,0,0,.85),0 1px 4px rgba(0,0,0,.6);
+  pointer-events:none;
+  opacity:0;
+  will-change:opacity,filter;
+}
+/* линия прочерчивается вместе с первым словом (--ql пишет JS) */
+.hero__quote::before{
+  content:"";
+  display:block;
+  width:38px;height:1px;margin-bottom:clamp(14px,1.6vw,22px);
+  background:rgba(255,255,255,.45);
+  transform:scaleX(var(--ql,0));
+  transform-origin:left center;
+  opacity:var(--ql,0);
+}
+.hero__quote .w{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(.4em);
+  filter:blur(7px);
+}
+
+/* — подсказка Scroll — */
+.hero__hint{
+  position:absolute;left:50%;bottom:clamp(22px,3.4vh,44px);
+  transform:translateX(-50%);
+  pointer-events:none;
+}
+/* внутренний слой держит intro-анимацию, внешний — прогресс скролла */
+.hero__hint-in{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  opacity:0;
+}
+.is-ready .hero__hint-in{transition:opacity 1s var(--ease) 1.3s;opacity:1}
+.hero__hint-label{
+  font-size:9.5px;letter-spacing:.42em;text-transform:uppercase;
+  color:rgba(255,255,255,.5);
+}
+.hero__hint-line{
+  width:1px;height:46px;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0));
+  transform-origin:top;
+  animation:hintPulse 2.4s var(--ease) infinite;
+}
+@keyframes hintPulse{
+  0%,100%{transform:scaleY(.35);opacity:.35}
+  45%{transform:scaleY(1);opacity:1}
+}
+
+/* — полоса загрузки по верхней границе страницы — */
+.loadbar{
+  position:fixed;inset:0 0 auto 0;z-index:60;
+  height:2px;
+  background:rgba(255,255,255,.09);
+  pointer-events:none;
+  transition:opacity .5s var(--ease) .45s;
+}
+.loadbar i{
+  display:block;height:100%;width:0%;
+  background:linear-gradient(90deg,rgba(255,255,255,.55),#fff);
+  box-shadow:0 0 12px rgba(255,255,255,.45);
+  transition:width .3s var(--ease);
+}
+.is-ready .loadbar{opacity:0}
+
+/* спрайт логотипов лежит в потоке — прячем, иначе занимает место */
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+
+/* ── DARK CONTENT ───────────────────────────────────────────── */
+.dark{position:relative;z-index:2;background:var(--black)}
+
+
+.sec-head{
+  display:grid;grid-template-columns:auto 1fr;gap:6px clamp(18px,3vw,44px);
+  align-items:end;
+  padding-bottom:clamp(30px,4.5vh,58px);
+  border-bottom:1px solid var(--line);
+  margin-bottom:clamp(38px,6vh,80px);
+}
+.sec-head__idx{
+  font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--mute-2);padding-bottom:.9em;
+}
+.sec-head__title{
+  margin:0;grid-column:2;
+  font-size:clamp(32px,5.6vw,78px);font-weight:600;line-height:1;
+  letter-spacing:-.015em;
+}
+.sec-head__note{
+  grid-column:2;margin:16px 0 0;max-width:52ch;
+  font-size:clamp(14px,1.15vw,17px);color:var(--mute);
+}
+
+/* ── ТРЕЙЛЕР ────────────────────────────────────────────────── */
+.reel{padding:clamp(150px,30vh,380px) 0 clamp(50px,7vh,110px)}
+.reel__grid{
+  display:grid;
+  grid-template-columns:minmax(220px,32%) 1fr;
+  gap:clamp(28px,5vw,90px);
+  align-items:start;
+}
+
+.reel__aside{
+  position:sticky;top:50vh;
+  transform:translateY(-50%);
+  will-change:transform,opacity;
+}
+.reel__kicker{
+  margin:0 0 clamp(20px,3vh,34px);
+  font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--mute-2);
+}
+.reel__list{
+  list-style:none;margin:0;padding:0;
+  display:flex;flex-direction:column;gap:clamp(10px,1.6vh,18px);
+  counter-reset:reel;
+}
+.reel__list li{
+  counter-increment:reel;
+  display:flex;align-items:baseline;gap:14px;
+  font-size:clamp(15px,1.4vw,22px);font-weight:400;
+  color:rgba(255,255,255,.22);
+  transition:color .55s var(--ease);
+}
+.reel__list li::before{
+  content:counter(reel,decimal-leading-zero);
+  font-size:10px;letter-spacing:.16em;
+  color:rgba(255,255,255,.18);
+  transition:color .55s var(--ease);
+}
+.reel__list li button{
+  position:relative;
+  appearance:none;-webkit-appearance:none;
+  background:none;border:0;padding:0;margin:0;
+  font:inherit;color:inherit;letter-spacing:inherit;
+  text-align:left;cursor:pointer;
+  transition:color .35s var(--ease);
+}
+.reel__list li:not(.on) button:hover{color:rgba(255,255,255,.62)}
+.reel__list li button:focus-visible{outline:1px solid rgba(255,255,255,.5);outline-offset:6px}
+.reel__list li button::after{
+  content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;
+  background:rgba(255,255,255,.5);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .6s var(--ease);
+}
+.reel__list li.on{color:#fff}
+.reel__list li.on::before{color:rgba(255,255,255,.55)}
+.reel__list li.on button::after{transform:scaleX(1)}
+
+.reel__cards{
+  display:flex;flex-direction:column;gap:clamp(70px,16vh,190px);
+  padding-bottom:clamp(120px,30vh,340px);
+}
+
+.rc{
+  display:block;position:relative;
+  padding:clamp(24px,2.8vw,44px) clamp(22px,2.6vw,44px) clamp(22px,2.4vw,38px);
+  border:1px solid var(--line);border-radius:3px;
+  background:linear-gradient(158deg,rgba(255,255,255,.035),rgba(255,255,255,0) 62%);
+  transition:border-color .5s var(--ease),background .6s var(--ease);
+  box-shadow:
+    0 0 70px rgba(255,255,255,calc(var(--glow,0) * .075)),
+    0 0 170px rgba(255,255,255,calc(var(--glow,0) * .055));
+  will-change:transform,opacity;
+}
+.rc:hover{
+  border-color:rgba(255,255,255,.32);
+  background:linear-gradient(158deg,rgba(255,255,255,.08),rgba(255,255,255,0) 62%);
+}
+.rc__idx{
+  position:absolute;top:clamp(20px,2.4vw,34px);right:clamp(20px,2.4vw,36px);
+  font-size:10.5px;letter-spacing:.24em;color:rgba(255,255,255,.26);
+}
+.rc__fig{
+  display:block;
+  font-size:clamp(34px,5.2vw,76px);font-weight:600;line-height:1;
+  letter-spacing:-.02em;
+  margin-bottom:clamp(14px,1.6vw,22px);
+  font-variant-numeric:tabular-nums;
+}
+.rc__fig b{font-weight:600}
+.rc__fig em{
+  font-size:.26em;font-style:normal;font-weight:400;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(255,255,255,.45);
+  vertical-align:.5em;padding-left:.3em;
+}
+.rc__fig--word{
+  font-size:clamp(22px,3.3vw,46px);
+  letter-spacing:-.01em;word-break:break-word;
+}
+.rc__text{
+  margin:0;max-width:56ch;
+  font-size:clamp(14px,1.12vw,17px);line-height:1.6;color:var(--mute);
+}
+.rc__go{
+  display:inline-flex;align-items:center;gap:13px;
+  margin-top:clamp(18px,2.2vw,30px);
+  font-size:clamp(13px,1.05vw,16px);
+  font-weight:400;letter-spacing:0;text-transform:none;
+  color:rgba(255,255,255,.62);
+  transition:color .45s var(--ease),transform .5s var(--ease);
+}
+.rc__go svg{
+  width:2.05em;height:2.05em;flex:none;
+  overflow:visible;
+}
+/* стрелка и подпись едут вместе — туда, куда указывает диагональ */
+.rc:hover .rc__go{color:#fff;transform:translate(-4px,4px)}
+
+/* — крупный заголовок-локап (секция Work) — */
+.sec-head--display{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:clamp(16px,4vw,60px);
+  padding-bottom:0;                 /* подпись прижата прямо к линии */
+  margin-bottom:clamp(40px,6vh,84px);
+}
+.sec-head--display .sec-head__idx{
+  padding-bottom:7px;
+  opacity:0;transition:opacity .9s var(--ease) .5s;
+}
+.sec-head--display.in .sec-head__idx{opacity:1}
+/* общий reveal тут не нужен: строки выезжают каждая из своей маски */
+.sec-head--display.reveal{opacity:1;transform:none;transition:none}
+.disp__line{display:block;overflow:hidden}
+.disp__line > span{
+  display:block;
+  transform:translateY(115%);
+  transition:transform 1.15s cubic-bezier(.16,1,.3,1);
+}
+.sec-head--display.in .disp__sm{transform:none}
+.sec-head--display.in .disp__lg{transform:none;transition-delay:.11s}
+.disp{
+  margin:0;
+  display:flex;flex-direction:column;
+  text-align:right;
+  line-height:.88;
+  padding-bottom:clamp(6px,1vw,16px);
+}
+.disp__sm{
+  font-size:clamp(19px,3.05vw,46px);
+  font-weight:600;
+  letter-spacing:-.012em;
+}
+.disp__lg{
+  font-size:clamp(40px,7.6vw,112px);
+  font-weight:700;
+  letter-spacing:-.032em;
+}
+
+
+/* ── WORK ───────────────────────────────────────────────────── */
+.work{padding:clamp(70px,10vh,130px) 0 clamp(70px,10vh,130px)}
+
+/* последняя глава линию не проводит: ниже начинается Skills со своей
+   чертой под заголовком, две подряд читались бы как пустая полоса */
+.work .case:last-child{border-bottom:0}
+.case{
+  position:relative;
+  padding:var(--lift) 0;
+  border-bottom:1px solid var(--line);
+  scroll-margin-top:calc(var(--nav-h) + 30px);
+}
+.case:last-of-type{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.proj__body{min-width:0}
+
+/* ── листалка проектов внутри главы ── */
+.pager{position:relative}
+/* проекты лежат в одной ячейке — уходят и приходят каждый сам по себе,
+   без общей ленты, поэтому листание закольцовано и края ничем не режутся */
+.pager__track{display:grid}
+.proj{
+  grid-area:1/1;min-width:0;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:clamp(24px,4vw,72px);align-items:center;
+  transform:translate3d(var(--x,0),0,0) scale(var(--s,1));
+  opacity:var(--o,1);
+  filter:blur(var(--b,0px));
+  pointer-events:var(--pe,auto);
+  transition:transform .85s var(--ease),opacity .85s var(--ease),filter .85s var(--ease);
+  will-change:transform,opacity;
+}
+.case--flip .proj .deck-wrap{order:2}
+
+/* стрелки — две палки без кружка, снаружи блока, по центру содержимого */
+.case__arrow{
+  position:absolute;z-index:4;
+  top:50%;                          /* у главы поля сверху и снизу равны */
+  transform:translateY(-50%);
+  width:clamp(18px,1.5vw,28px);height:clamp(32px,2.7vw,50px);
+  padding:0;border:0;background:none;cursor:pointer;
+  color:rgba(255,255,255,.55);
+  opacity:.4;
+  animation:arrowHint 7s var(--ease) infinite;
+  transition:opacity .45s var(--ease),color .45s var(--ease);
+}
+.case__arrow svg{width:100%;height:100%}
+.case__arrow--prev{left:calc(-1 * clamp(30px,3.4vw,74px))}
+.case__arrow--next{right:calc(-1 * clamp(30px,3.4vw,74px))}
+.case:hover .case__arrow{opacity:.95;animation:none}
+.case__arrow:hover{color:#fff;opacity:1}
+.case__arrow[disabled]{opacity:.1!important;pointer-events:none;animation:none}
+@keyframes arrowHint{
+  0%,86%,100%{opacity:.34}
+  92%{opacity:.7}
+}
+
+/* ── колода карточек ── */
+.deck-wrap{min-width:0}
+.deck{
+  position:relative;aspect-ratio:5/3;
+  /* верх открыт под стопку, низ обрезан — падающая карточка уходит в темноту
+     и не наезжает на подпись с кружками */
+  clip-path:inset(calc(-1 * var(--lift)) 0 0 0);
+  cursor:pointer;
+}
+.card{
+  position:absolute;inset:0;margin:0;
+  border:1px solid rgba(255,255,255,.34);border-radius:3px;
+  overflow:hidden;background:#0a0c10;
+  transform-origin:50% 100%;
+  transform:translateY(calc(var(--d,0) * -13%)) scale(calc(1 - var(--d,0) * .05));
+  /* тень отделяет верхнюю карточку от лежащих под ней */
+  box-shadow:0 -2px 0 rgba(0,0,0,.9),0 18px 44px rgba(0,0,0,.75);
+  transition:transform .7s var(--ease),opacity .7s var(--ease);
+  will-change:transform,opacity;
+}
+.card img{width:100%;height:100%;object-fit:cover;display:block}
+.card--ph{
+  display:grid;place-items:center;
+  background:
+    radial-gradient(120% 140% at 24% 6%,rgba(255,255,255,.07),rgba(255,255,255,0) 60%),
+    linear-gradient(158deg,#161a21,#04060a 76%);
+}
+.card--ph span{font-size:clamp(38px,5vw,84px);font-weight:200;color:rgba(255,255,255,.09)}
+
+/* вперёд: верхняя карточка падает вниз и тонет в темноте */
+.card.is-out{animation:cardOut .8s var(--ease) forwards}
+@keyframes cardOut{
+  0%  {transform:translateY(0) scale(1);opacity:1}
+  100%{transform:translateY(34%) scale(.98);opacity:0}
+}
+/* назад: карточка поднимается снизу обратно на верх колоды */
+.card.is-in{animation:cardIn .8s var(--ease) backwards}
+@keyframes cardIn{
+  0%  {transform:translateY(34%) scale(.98);opacity:0}
+  100%{transform:translateY(0) scale(1);opacity:1}
+}
+
+/* ── общая рамка карточек: скругление и белая обводка с переливом ──
+   Обводка нарисована градиентом и вырезана маской: одна линия по краю,
+   но яркость вдоль неё гуляет, поэтому край ловит свет, а не выглядит
+   ровной серой чертой. Контейнерам с overflow:hidden это не мешает —
+   псевдоэлемент обрезается по тому же скруглению */
+.card,
+.fan__card,
+.slide__card:not(.slide__card--bare),
+.demo,
+.combo__item{
+  border:0;
+  border-radius:var(--r-card);
+}
+.card::after,
+.fan__card::after,
+.slide__card:not(.slide__card--bare)::after,
+.demo::before,
+.combo__item::after{
+  content:"";position:absolute;inset:0;z-index:5;
+  border-radius:inherit;pointer-events:none;
+  padding:1px;
+  background:linear-gradient(135deg,
+    rgba(255,255,255,.92)   0%,
+    rgba(255,255,255,.34)  22%,
+    rgba(255,255,255,.10)  42%,
+    rgba(255,255,255,.26)  62%,
+    rgba(255,255,255,.78)  82%,
+    rgba(255,255,255,.30) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+}
+
+/* ── коллаж: несколько карточек внахлёст, каждая под своим углом ── */
+.combo{
+  position:relative;display:grid;place-items:center;
+  margin-inline:auto;
+  /* поворот выносит углы за габарит сетки — оставляем им воздух */
+  padding-block:clamp(8px,1.4vw,24px);
+}
+.combo__item{
+  grid-area:1/1;position:relative;margin:0;
+  width:var(--w,50%);
+  /* --up добавляется к собственному сдвигу карточки: так подъём при наведении
+     не стирает раскладку коллажа, а накладывается поверх неё */
+  transform:translate(var(--x,0),calc(var(--y,0%) + var(--up,0px))) rotate(var(--r,0deg));
+  z-index:var(--z,1);
+  box-shadow:0 26px 60px rgba(0,0,0,.72);
+  overflow:hidden;
+  transition:transform .55s var(--ease),box-shadow .55s var(--ease),opacity .45s var(--ease);
+}
+.combo__item img{width:100%;height:auto;display:block}
+
+/* Сдвиг --x считается от ширины самой карточки, поэтому у каждой раскладки
+   он свой: сумма «половина карточки + сдвиг» не должна переваливать за
+   половину коллажа, иначе карточка вылезает из колонки в поля страницы */
+
+/* два диплома: развёрнуты в разные стороны, правый сверху */
+.combo--hack{max-width:760px}
+.combo--hack .combo__item:nth-child(1){--w:48%;--x:-42%;--y:2%;--r:-4.5deg;--z:1}
+.combo--hack .combo__item:nth-child(2){--w:48%;--x:42%;--y:-2%;--r:4deg;--z:2}
+
+/* Chicko: упаковки по краям, грамота по центру и выше остальных */
+.combo--chicko{max-width:1040px}
+.combo--chicko .combo__item:nth-child(1){--w:38%;--x:-72%;--y:6%;--r:-4deg;--z:1}
+.combo--chicko .combo__item:nth-child(2){--w:38%;--x:72%;--y:4%;--r:4.5deg;--z:2}
+.combo--chicko .combo__item:nth-child(3){--w:28%;--y:-3%;--r:0deg;--z:3}
+
+/* отзывы: избранный комментарий слева, справа две ленты внахлёст —
+   как пара дипломов, только задняя приглушена, пока на неё не навели */
+.combo--reviews{max-width:1180px}
+.combo--reviews .combo__item:nth-child(1){--w:34%;--x:-70%;--y:2%;--r:-2.5deg;--z:3}
+.combo--reviews .combo__item:nth-child(2){--w:40%;--x:28%;--y:8%;--r:-1.5deg;--z:2}
+.combo--reviews .combo__item:nth-child(3){--w:40%;--x:52%;--y:-8%;--r:2.5deg;--z:1;opacity:.62}
+
+/* наведение: карточка всплывает над соседями, выходит из тени и,
+   если была приглушена, набирает полный цвет. Правило идёт последним и
+   с тем же весом, что и раскладки выше, — иначе их opacity перебивает его */
+@media (hover:hover){
+  .combo .combo__item:hover{
+    --up:-16px;
+    z-index:9;
+    opacity:1;
+    box-shadow:0 42px 84px rgba(0,0,0,.8);
+  }
+}
+
+/* ── подача главы наград: коллаж, под ним заголовок и подпись ── */
+/* у этой главы нет пары справа, поэтому подача стоит по центру колонки,
+   а не жмётся к левому краю; на узком экране возвращаем обычную вычитку */
+.award__lead{max-width:72ch;margin-inline:auto;text-align:center}
+.award__lead .case__text{margin-inline:auto}
+.award{margin-top:clamp(58px,7.5vw,116px)}
+.award__body{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);
+  gap:clamp(14px,2.4vw,54px);
+  margin-top:clamp(22px,2.6vw,40px);
+}
+.award__title{
+  margin:0;
+  font-size:clamp(17px,1.5vw,23px);font-weight:600;line-height:1.25;
+  letter-spacing:-.01em;
+}
+.award__badge{
+  display:inline-block;vertical-align:middle;
+  margin-left:.6em;
+  padding:5px 13px;
+  font-size:10.5px;font-weight:400;
+  letter-spacing:.13em;text-transform:uppercase;
+  color:rgba(255,255,255,.72);
+  border:1px solid var(--line);border-radius:999px;
+}
+.award__text{
+  margin:0;max-width:56ch;
+  font-size:clamp(13.5px,1.05vw,16px);line-height:1.65;color:var(--mute);
+}
+
+/* ── ступени: три подачи в одной колонке, переключаются точками ── */
+.stages{
+  position:relative;aspect-ratio:3/2;
+  display:grid;
+}
+.stage{
+  grid-area:1/1;position:relative;
+  opacity:0;visibility:hidden;
+  transition:opacity .55s var(--ease),visibility 0s linear .55s;
+}
+.stage.is-on{opacity:1;visibility:visible;transition-delay:0s,0s}
+
+/* ── стопка кадров: лежат внахлёст, верхний уходит вбок ── */
+.slide{position:relative;height:100%;cursor:pointer}
+.slide__card{
+  position:absolute;top:50%;left:50%;
+  width:84%;margin:0;aspect-ratio:16/9;
+  border:1px solid rgba(255,255,255,.28);border-radius:5px;
+  overflow:hidden;background:#0a0c10;
+  /* сдвиг вправо-вниз на каждую ступень вглубь — так видно всю стопку сразу */
+  transform:
+    translate(-50%,-50%)
+    translate(calc(var(--d,0) * 7%),calc(var(--d,0) * 5%))
+    scale(calc(1 - var(--d,0) * .06));
+  box-shadow:0 -1px 0 rgba(0,0,0,.9),0 22px 52px rgba(0,0,0,.75);
+  transition:transform .7s var(--ease),opacity .7s var(--ease);
+  will-change:transform,opacity;
+}
+.slide__card img{width:100%;height:100%;object-fit:cover;display:block}
+/* статистика — скриншоты с текстом, их нельзя кадрировать */
+.slide--fit .slide__card{
+  width:92%;aspect-ratio:auto;height:88%;
+  border:0;border-radius:0;background:none;box-shadow:none;
+}
+.slide--fit .slide__card img{height:100%;object-fit:contain}
+/* вперёд — верхний кадр улетает вправо; назад — возвращается оттуда же.
+   Вправо, а не влево: колонка с кадрами стоит справа от текста, и уходящий
+   кадр иначе наползал бы на заголовок главы */
+.slide__card.is-out{animation:slideOut .78s var(--ease) forwards}
+@keyframes slideOut{
+  0%  {transform:translate(-50%,-50%) rotate(0) scale(1);opacity:1}
+  100%{transform:translate(65%,-50%) rotate(7deg) scale(.92);opacity:0}
+}
+.slide__card.is-in{animation:slideIn .78s var(--ease) backwards}
+@keyframes slideIn{
+  0%  {transform:translate(65%,-50%) rotate(7deg) scale(.92);opacity:0}
+  100%{transform:translate(-50%,-50%) rotate(0) scale(1);opacity:1}
+}
+
+/* ── веер постов: три карточки в развороте, дальше — следующая тройка ── */
+.fan{
+  position:relative;aspect-ratio:5/4;
+  cursor:pointer;
+}
+.fan__card{
+  position:absolute;top:50%;left:50%;
+  width:50%;margin:0;aspect-ratio:4/5;
+  border:1px solid rgba(255,255,255,.28);border-radius:5px;
+  overflow:hidden;background:#0a0c10;
+  /* порядок важен: сначала центрируем, потом разводим и поворачиваем,
+     иначе проценты сдвига считались бы от уже повёрнутой оси */
+  transform:
+    translate(-50%,-50%)
+    translate(var(--fx,0),var(--fy,0))
+    rotate(var(--fr,0deg))
+    scale(var(--fs,1));
+  opacity:var(--fo,0);
+  box-shadow:0 -1px 0 rgba(0,0,0,.9),0 26px 60px rgba(0,0,0,.72);
+  transition:transform .9s var(--ease),opacity .7s var(--ease);
+  transition-delay:var(--fd,0ms);
+  will-change:transform,opacity;
+}
+.fan__card img{width:100%;height:100%;object-fit:cover;display:block}
+/* посты для соцсетей квадратные, а не 4:5 — веер тот же, пропорция другая */
+.fan--square{aspect-ratio:auto;height:100%}
+.fan--square .fan__card{width:53%;aspect-ratio:1/1}
+/* превью 16:9 шире и ниже: разлёт приходится ужать, иначе тройка не влезает */
+.fan--wide{aspect-ratio:auto;height:100%}
+.fan--wide .fan__card{width:66%;aspect-ratio:16/9}
+
+/* ── обложка главы: полоса во всю ширину с параллаксом ── */
+.cover{
+  position:relative;
+  /* вырываемся из .shell на всю ширину окна: обрезанная по колонке полоса
+     не читалась бы как разворот */
+  width:100vw;margin-inline:calc(50% - 50vw);
+  height:clamp(340px,60vh,720px);
+  /* минусом съедаем верхнее поле главы: картинка начинается прямо
+     от разделительной линии второго раздела, без чёрной полосы над ней */
+  margin-top:calc(-1 * var(--lift));
+  margin-bottom:clamp(24px,3vw,50px);
+  overflow:hidden;
+  background:var(--black);
+  /* пока глава проявляется, нижний край обрезки успевал мигнуть тонкой
+     светлой полосой: собственный слой убирает этот шов */
+  transform:translateZ(0);
+  backface-visibility:hidden;
+}
+/* обложка хвостом главы: не съедает верхнее поле, а стоит под текстом.
+   Полоса с отзывами ниже и шире — читается как лента, а не как отдельный экран */
+.cover--tail{
+  margin-top:clamp(50px,7vw,110px);
+  margin-bottom:0;
+  height:clamp(200px,34vh,430px);
+}
+/* эта полоса стоит посреди чёрного поля, а не встык с разделителем,
+   поэтому верх ей тоже надо погасить — иначе край читается швом */
+.cover--tail::after{
+  background:linear-gradient(180deg,
+    var(--black)      0%,
+    rgba(0,0,0,.72)   4%,
+    rgba(0,0,0,.40)   9%,
+    rgba(0,0,0,.18)  15%,
+    rgba(0,0,0,.05)  22%,
+    rgba(0,0,0,0)    30%,
+    rgba(0,0,0,0)    44%,
+    rgba(0,0,0,.10)  53%,
+    rgba(0,0,0,.24)  63%,
+    rgba(0,0,0,.44)  73%,
+    rgba(0,0,0,.64)  81%,
+    rgba(0,0,0,.82)  88%,
+    rgba(0,0,0,.94)  95%,
+    var(--black)    100%);
+}
+.cover__img{
+  position:absolute;left:50%;top:50%;
+  width:100%;height:128%;
+  object-fit:cover;object-position:50% 50%;
+  /* запас по высоте — тот самый ход параллакса, картинка не должна
+     оголить края в крайних положениях */
+  transform:translate3d(-50%,calc(-50% + var(--py,0px)),0) scale(var(--ps,1));
+  will-change:transform;
+}
+/* сверху и снизу картинка растворяется в фоне страницы, а не режется краем.
+   Стопов много и ступени между ними мелкие: на паре стопов переход читается
+   полосой, а нужно, чтобы темнота расходилась незаметно */
+.cover::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  /* затемнение только снизу: картинка уходит в фон страницы и держит
+     подпись, а сверху начинается сразу от линии раздела, в полную силу */
+  background:linear-gradient(180deg,
+    rgba(0,0,0,0)     0%,
+    rgba(0,0,0,0)    44%,
+    rgba(0,0,0,.08)  53%,
+    rgba(0,0,0,.20)  63%,
+    rgba(0,0,0,.38)  73%,
+    rgba(0,0,0,.58)  81%,
+    rgba(0,0,0,.78)  88%,
+    rgba(0,0,0,.93)  95%,
+    var(--black)    100%);
+}
+.cover__title{
+  position:absolute;left:0;right:0;bottom:clamp(18px,3.4vh,46px);z-index:2;
+  margin:0;padding:0 var(--pad);
+  text-align:center;
+  font-size:clamp(28px,4.4vw,66px);font-weight:600;line-height:1.05;
+  letter-spacing:-.015em;
+  text-shadow:0 2px 30px rgba(0,0,0,.85),0 1px 6px rgba(0,0,0,.7);
+}
+
+/* ── демо-видео проекта: одна рамка вместо колоды ── */
+.demo{
+  position:relative;aspect-ratio:16/9;
+  border:1px solid rgba(255,255,255,.28);border-radius:5px;
+  overflow:hidden;background:#0a0c10;
+  box-shadow:0 -1px 0 rgba(0,0,0,.9),0 18px 44px rgba(0,0,0,.75);
+  cursor:pointer;
+}
+.demo__video{width:100%;height:100%;object-fit:cover;display:block}
+/* пауза заметна только по наведению — подпись поверх кадра была бы лишним шумом */
+.demo::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:rgba(0,0,0,.28);
+  opacity:0;transition:opacity .4s var(--ease);
+}
+.demo.is-held::after{opacity:1}
+
+.deck__bar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding-top:clamp(12px,1.2vw,20px);
+}
+.deck__caps{position:relative;margin:0;flex:1;min-height:1.3em}
+.deck__caps span{
+  position:absolute;left:0;top:0;
+  font-size:clamp(11px,.85vw,14px);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--mute-2);
+  opacity:0;transform:translateY(4px);
+  transition:opacity .4s var(--ease),transform .4s var(--ease);
+}
+.deck__caps span.on{opacity:1;transform:none;color:rgba(255,255,255,.7)}
+/* стрелки стоят по бокам от точек: тем, кому не хочется ждать автосмену,
+   нужна явная ручка, а точки под неё слишком мелкие */
+.deck__nav{display:flex;align-items:center;gap:clamp(9px,1vw,15px)}
+.deck__arrow{
+  width:15px;height:15px;padding:0;border:0;background:none;cursor:pointer;
+  color:rgba(255,255,255,.28);
+  transition:color .35s var(--ease),transform .35s var(--ease);
+}
+.deck__arrow svg{width:100%;height:100%;display:block}
+.deck__arrow:hover{color:#fff}
+.deck__arrow--prev:hover{transform:translateX(-2px)}
+.deck__arrow--next:hover{transform:translateX(2px)}
+
+.deck__dots{display:flex;align-items:center;gap:9px}
+.deck__dots button{
+  width:7px;height:7px;padding:0;border:0;border-radius:50%;
+  background:rgba(255,255,255,.22);cursor:pointer;
+  transition:background .4s var(--ease),transform .4s var(--ease);
+}
+.deck__dots button:hover{background:rgba(255,255,255,.5)}
+.deck__dots button.on{background:#fff;transform:scale(1.35)}
+
+/* дефис — законный перенос, но «PNG-аватаров» рвать по нему не надо */
+.nb{white-space:nowrap}
+
+.case__title{
+  margin:0 0 clamp(14px,1.7vw,22px);
+  font-size:clamp(22px,2.9vw,42px);font-weight:600;line-height:1.1;
+  letter-spacing:-.015em;
+}
+.case__text{
+  margin:0;max-width:54ch;
+  font-size:clamp(14px,1.12vw,17px);line-height:1.65;color:var(--mute);
+}
+.case__link{
+  display:inline-flex;align-items:center;gap:9px;
+  margin-top:clamp(18px,2.2vw,28px);
+  font-size:13px;letter-spacing:.06em;
+  color:#fff;
+  border-bottom:1px solid rgba(255,255,255,.3);
+  padding-bottom:3px;
+  transition:border-color .4s var(--ease),gap .4s var(--ease);
+}
+.case__link svg{width:15px;height:15px}
+.case__link:hover{border-color:#fff;gap:13px}
+.case__note{
+  margin:clamp(14px,1.8vw,22px) 0 0;
+  font-size:12.5px;color:var(--mute-2);
+}
+/* кнопка скачивания: та же пилюля, что у «Let's talk» в шапке —
+   подчёркнутой ссылкой такой призыв читался бы как сноска */
+.case__dl{
+  position:relative;overflow:hidden;
+  display:inline-flex;align-items:center;gap:10px;
+  margin-top:clamp(18px,2.2vw,28px);
+  padding:clamp(10px,.8vw,15px) clamp(20px,1.7vw,32px);
+  font-size:13px;letter-spacing:.06em;
+  color:rgba(255,255,255,.9);
+  border:1px solid var(--line);border-radius:999px;
+  transition:border-color .4s var(--ease),color .4s var(--ease),gap .4s var(--ease);
+}
+.case__dl svg{width:15px;height:15px}
+.case__dl:hover{border-color:rgba(255,255,255,.45);color:#fff;gap:14px}
+/* блик: почти весь цикл ждёт за левым краем и раз в несколько секунд
+   проходит по кнопке — так она напоминает о себе, не мигая без остановки */
+.case__dl::before{
+  content:"";position:absolute;top:0;bottom:0;left:0;width:26%;
+  background:linear-gradient(100deg,
+    rgba(255,255,255,0),
+    rgba(255,255,255,.30) 50%,
+    rgba(255,255,255,0));
+  transform:translateX(-200%) skewX(-18deg);
+  /* linear, а не общий --ease: с ускорением блик проскакивает так быстро,
+     что успевает мигнуть только у самого края */
+  animation:dlShine 6.5s linear infinite;
+  pointer-events:none;
+}
+/* текст и стрелка позиционированы, иначе блик закрасил бы их собой */
+.case__dl > *{position:relative}
+@keyframes dlShine{
+  0%,74%  {transform:translateX(-200%) skewX(-18deg)}
+  93%,100%{transform:translateX(600%)  skewX(-18deg)}
+}
+/* под кнопкой подпись стоит ближе, чем обычная сноска главы */
+.case__dl + .case__note{margin-top:clamp(10px,1.1vw,14px)}
+
+
+/* ── SKILLS ─────────────────────────────────────────────────── */
+.skills{
+  position:relative;isolation:isolate;
+  /* зарево уходит шире колонки — по горизонтали его подрезаем,
+     иначе страница получает лишнюю ширину */
+  overflow-x:clip;
+  padding:clamp(70px,10vh,130px) 0 clamp(70px,10vh,130px);
+}
+/* два очень слабых пятна света за спиной у главы: они медленно ходят
+   в разные стороны, поэтому чёрный фон перестаёт быть плоским */
+.skills::before,
+.skills::after{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+}
+.skills::before{
+  inset:-10% -20% auto;height:78%;
+  background:radial-gradient(46% 52% at 30% 40%,rgba(255,255,255,.06),transparent 70%);
+  filter:blur(22px);
+  animation:sklDrift 34s var(--ease) infinite alternate;
+}
+.skills::after{
+  inset:auto -25% -6% 30%;height:56%;
+  background:radial-gradient(50% 50% at 60% 60%,rgba(255,255,255,.045),transparent 72%);
+  filter:blur(30px);
+  animation:sklDrift2 46s var(--ease) infinite alternate;
+}
+@keyframes sklDrift{
+  from{transform:translate3d(-6%,0,0) scale(1)}
+  to  {transform:translate3d(10%,4%,0) scale(1.16)}
+}
+@keyframes sklDrift2{
+  from{transform:translate3d(6%,3%,0) scale(1.05)}
+  to  {transform:translate3d(-12%,-5%,0) scale(1.22)}
+}
+
+/* ── программы: категория и под ней круглые плашки ──────────── */
+.soft{position:relative}
+.soft__group + .soft__group{margin-top:clamp(28px,3.6vw,48px)}
+.soft__cat{
+  display:flex;align-items:baseline;gap:12px;
+  margin:0 0 clamp(12px,1.4vw,18px);
+  font-size:clamp(17px,1.7vw,24px);font-weight:500;letter-spacing:-.012em;
+  color:rgba(255,255,255,.94);
+}
+.soft__row{
+  list-style:none;margin:0;padding:0;
+  display:flex;flex-wrap:wrap;gap:clamp(7px,.7vw,10px);
+}
+
+.pill{
+  position:relative;overflow:hidden;
+  display:inline-flex;align-items:center;gap:11px;
+  padding:5px 20px 5px 5px;
+  border:1px solid var(--line);border-radius:999px;
+  background:linear-gradient(140deg,rgba(255,255,255,.05),rgba(255,255,255,.012) 62%);
+  /* появление: плашки набегают волной и на ходу выходят из размытия */
+  opacity:0;transform:translateY(14px) scale(.96);filter:blur(6px);
+  transition:
+    opacity .6s var(--ease),transform .7s var(--ease),filter .6s var(--ease),
+    border-color .4s var(--ease),background .4s var(--ease),box-shadow .5s var(--ease);
+  transition-delay:calc(var(--i,0) * 38ms);
+}
+.soft__group.in .pill{opacity:1;transform:none;filter:none}
+.pill__ic{
+  flex:none;
+  width:clamp(30px,2.6vw,36px);height:clamp(30px,2.6vw,36px);
+  display:grid;place-items:center;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.14);
+  background:
+    radial-gradient(120% 120% at 30% 20%,rgba(255,255,255,.14),rgba(255,255,255,.02) 62%),
+    rgba(255,255,255,.03);
+  color:rgba(255,255,255,.78);
+  transition:color .4s var(--ease),background .4s var(--ease),
+             border-color .4s var(--ease),box-shadow .5s var(--ease);
+}
+.pill__glyph{
+  /* размер задаём явно: у инлайнового svg нет своей высоты,
+     и проценты развернули бы кружок в овал */
+  width:clamp(15px,1.35vw,18px);height:clamp(15px,1.35vw,18px);
+  display:block;
+  /* у логотипов заливка, у рисованных значков обводка — работает и то, и то */
+  fill:currentColor;
+}
+.pill b{
+  font-size:clamp(12.5px,1.02vw,14px);font-weight:400;letter-spacing:-.004em;
+  white-space:nowrap;
+  color:rgba(255,255,255,.78);
+  transition:color .4s var(--ease);
+}
+
+/* курсор ведёт по ряду пятно света: мягкая заливка внутри плашки
+   и та же точка, вырезанная маской по краю, — так подсвечивается обводка */
+.pill::before,
+.pill::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;
+  pointer-events:none;
+  /* --lit считает JS по расстоянию до курсора: соседние ряды не светятся */
+  opacity:0;
+  transition:opacity .45s var(--ease);
+}
+.pill::before{
+  background:radial-gradient(140px circle at var(--mx,-300px) var(--my,-300px),
+    rgba(255,255,255,.14),transparent 62%);
+}
+.pill::after{
+  padding:1px;
+  background:radial-gradient(170px circle at var(--mx,-300px) var(--my,-300px),
+    rgba(255,255,255,.9),rgba(255,255,255,.07) 55%,transparent 72%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+}
+.soft.is-live .pill::before,
+.soft.is-live .pill::after{opacity:var(--lit,0);transition:opacity .18s linear}
+
+@media (hover:hover){
+  .pill:hover{
+    transform:translateY(-2px);
+    border-color:rgba(255,255,255,.24);
+    background:linear-gradient(140deg,rgba(255,255,255,.1),rgba(255,255,255,.02) 64%);
+    box-shadow:0 14px 38px -20px rgba(255,255,255,.5);
+  }
+  /* кружок под курсором наливается светом и меняет полярность */
+  .pill:hover .pill__ic{
+    color:#000;border-color:transparent;
+    background:#fff;
+    box-shadow:0 0 0 1px rgba(255,255,255,.2),0 6px 20px -8px rgba(255,255,255,.8);
+  }
+  .pill:hover b{color:#fff}
+}
+
+/* ── CONTACT ────────────────────────────────────────────────── */
+.contact{
+  position:relative;isolation:isolate;
+  padding:clamp(80px,12vh,160px) 0 clamp(70px,10vh,130px);
+  border-top:1px solid var(--line);
+}
+.contact__grid{
+  display:grid;grid-template-columns:1.3fr 1fr;
+  gap:clamp(34px,6vw,110px);align-items:center;
+}
+.contact__title{
+  margin:0 0 clamp(30px,4vw,52px);
+  font-size:clamp(32px,5.2vw,72px);font-weight:600;line-height:1.02;
+  letter-spacing:-.02em;
+}
+.contact__links{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.contact__links li{border-top:1px solid var(--line)}
+.contact__links li:last-child{border-bottom:1px solid var(--line)}
+.contact__links a{
+  display:grid;grid-template-columns:110px 1fr auto;align-items:center;gap:16px;
+  padding:clamp(16px,2vw,24px) 0;
+  transition:padding-left .45s var(--ease);
+}
+.contact__links a:hover{padding-left:12px}
+.contact__label{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute-2);
+}
+.contact__value{
+  font-size:clamp(16px,1.7vw,24px);font-weight:400;color:#fff;
+}
+.contact__links svg{width:20px;height:20px;color:rgba(255,255,255,.35);transition:color .45s var(--ease)}
+.contact__links a:hover svg{color:#fff}
+
+/* ── QR: белая карточка на чёрном, всплывает из размытия ────── */
+.contact__qr{
+  position:relative;
+  justify-self:end;align-self:center;
+  width:min(100%,clamp(210px,24vw,330px));
+  aspect-ratio:1/1;
+  /* сцена для покачивания: без перспективы поворот читался бы плоским */
+  perspective:900px;
+}
+.contact__qr-card{
+  position:relative;width:100%;height:100%;overflow:hidden;
+  padding:clamp(12px,1.4vw,20px);
+  border-radius:clamp(14px,1.5vw,22px);
+  background:#fff;
+  box-shadow:0 26px 70px -34px rgba(255,255,255,.55);
+  will-change:transform;
+}
+/* медленное покачивание в трёх осях: периоды разной длины, поэтому
+   движение не зацикливается заметной петлёй. Стартует после появления */
+.contact__qr.in .contact__qr-card{animation:qrSway 17s ease-in-out .9s infinite}
+@keyframes qrSway{
+  0%  {transform:rotateX(6.5deg)  rotateY(-11deg) rotateZ(-1.2deg) translateZ(0)}
+  25% {transform:rotateX(-3deg)   rotateY(-4deg)  rotateZ(.6deg)   translateZ(14px)}
+  50% {transform:rotateX(-6.5deg) rotateY(11deg)  rotateZ(1.2deg)  translateZ(0)}
+  75% {transform:rotateX(3deg)    rotateY(4deg)   rotateZ(-.6deg)  translateZ(-10px)}
+  100%{transform:rotateX(6.5deg)  rotateY(-11deg) rotateZ(-1.2deg) translateZ(0)}
+}
+/* мягкое зарево за карточкой — оно дышит, чтобы угол не был мёртвым */
+.contact__qr::before{
+  content:"";position:absolute;inset:-14%;z-index:-1;
+  border-radius:inherit;pointer-events:none;
+  background:radial-gradient(58% 58% at 50% 50%,rgba(255,255,255,.16),transparent 72%);
+  filter:blur(26px);
+  animation:qrPulse 7.5s var(--ease) infinite alternate;
+}
+@keyframes qrPulse{
+  from{opacity:.5;transform:scale(.94)}
+  to  {opacity:1;transform:scale(1.04)}
+}
+.contact__qr-card img{width:100%;height:100%;object-fit:contain}
+
+/* появление: карточка выходит из размытия и слегка доворачивается */
+.contact__qr.reveal{
+  opacity:0;
+  transform:translateY(26px) scale(.9) rotate(-2.5deg);
+  filter:blur(18px);
+  transition:
+    opacity 1.1s var(--ease),
+    transform 1.25s cubic-bezier(.16,1,.3,1),
+    filter 1.1s var(--ease);
+}
+.contact__qr.reveal.in{opacity:1;transform:none;filter:none}
+/* следом по карточке один раз проходит блик */
+.contact__qr-card::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.85) 50%,transparent 62%);
+  mix-blend-mode:overlay;
+  opacity:0;transform:translateX(-120%);
+}
+.contact__qr.in .contact__qr-card::after{animation:qrShine 1.5s var(--ease) .75s 1}
+@keyframes qrShine{
+  0%  {opacity:0;transform:translateX(-120%)}
+  22% {opacity:1}
+  100%{opacity:0;transform:translateX(120%)}
+}
+
+/* ── ФУТЕР ──────────────────────────────────────────────────── */
+.foot{
+  position:relative;isolation:isolate;overflow-x:clip;
+  padding:clamp(54px,9vh,110px) 0 calc(env(safe-area-inset-bottom,0px) + clamp(30px,5vh,56px));
+  border-top:1px solid var(--line);
+}
+/* последнее пятно света: страница не обрывается плоским чёрным */
+.foot::before{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  inset:-40% -20% auto;height:180%;
+  background:radial-gradient(42% 46% at 50% 0%,rgba(255,255,255,.05),transparent 72%);
+  filter:blur(24px);
+}
+.foot__inner{
+  display:flex;flex-direction:column;align-items:center;
+  gap:clamp(18px,2.6vw,30px);
+}
+.foot__mark{
+  display:block;width:clamp(46px,4vw,68px);
+  color:rgba(255,255,255,.5);
+  transition:color .5s var(--ease),transform .6s var(--ease);
+}
+.foot__mark svg{width:100%;height:auto;display:block}
+.foot__mark:hover{color:rgba(255,255,255,.95);transform:translateY(-3px)}
+.foot__mark:focus-visible{outline:1px solid rgba(255,255,255,.5);outline-offset:8px}
+.foot__copy{
+  margin:0;text-align:center;
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--mute-2);
+}
+
+/* ── REVEAL ─────────────────────────────────────────────────── */
+.reveal{
+  opacity:0;transform:translateY(26px);
+  transition:opacity 1s var(--ease),transform 1.1s var(--ease);
+}
+.reveal.in{opacity:1;transform:none}
+
+/* ── ЛАЙТБОКС: любая картинка главы раскрывается по центру экрана ─ */
+[data-zoom]{cursor:zoom-in}
+
+/* пока открыт лайтбокс, страница под ним не скроллится;
+   --sbw возвращает на место ширину исчезнувшей полосы прокрутки */
+html.is-locked{overflow:hidden}
+html.is-locked body{padding-right:var(--sbw,0px)}
+html.is-locked .nav{padding-right:calc(var(--pad) + var(--sbw,0px))}
+
+.lb{
+  position:fixed;inset:0;z-index:120;
+  display:grid;place-items:center;
+  padding:clamp(16px,4vw,56px);
+  background:rgba(0,0,0,.86);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  opacity:0;transition:opacity .32s var(--ease);
+}
+.lb[hidden]{display:none}
+.lb.is-on{opacity:1}
+
+.lb__stage{
+  position:relative;margin:0;
+  display:grid;justify-items:center;gap:14px;
+  transform:scale(.965);
+  transition:transform .38s var(--ease);
+}
+.lb.is-on .lb__stage{transform:none}
+.lb__img{
+  max-width:min(1600px,92vw);max-height:82vh;
+  width:auto;height:auto;
+  border-radius:var(--r-card);
+  box-shadow:0 40px 120px rgba(0,0,0,.9);
+}
+.lb__cap{
+  max-width:64ch;text-align:center;
+  font-size:clamp(12px,1vw,14px);line-height:1.5;color:var(--mute);
+}
+
+/* кнопки поверх подложки: закрыть по углу, листание по краям */
+.lb__btn{
+  position:absolute;z-index:2;
+  display:grid;place-items:center;
+  padding:0;background:none;border:1px solid var(--line);border-radius:999px;
+  color:rgba(255,255,255,.62);cursor:pointer;
+  transition:color .3s var(--ease),border-color .3s var(--ease),transform .3s var(--ease);
+}
+.lb__btn:hover{color:#fff;border-color:rgba(255,255,255,.45)}
+.lb__btn svg{width:46%;height:46%;fill:none;stroke:currentColor;stroke-width:1.6}
+.lb__close{
+  top:clamp(14px,2.4vw,32px);right:clamp(14px,2.4vw,32px);
+  width:44px;height:44px;
+}
+.lb__nav{
+  top:50%;margin-top:-26px;
+  width:52px;height:52px;
+}
+.lb__nav--prev{left:clamp(10px,2.2vw,34px)}
+.lb__nav--next{right:clamp(10px,2.2vw,34px)}
+.lb__nav--prev:hover{transform:translateX(-3px)}
+.lb__nav--next:hover{transform:translateX(3px)}
+.lb__nav[hidden]{display:none}
+
+@media (max-width:640px){
+  .lb__img{max-width:94vw;max-height:74vh}
+  .lb__nav{width:42px;height:42px;margin-top:-21px}
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width:1024px){
+  .nav__menu,.nav__cta{display:none}
+  .nav__burger{display:block}
+  .nav{grid-template-columns:1fr auto}
+
+  /* меню свернулось в бургер — значит это уже мобильная версия:
+     корона и бургер перестают зависеть от vw и берут крупный фиксированный размер */
+  .nav__mark{width:clamp(48px,7vw,62px)}
+  .nav__burger{width:48px;height:48px}
+  .nav__burger span{left:11px;width:26px}
+  .nav__burger span:nth-child(1){top:20px}
+  .nav__burger span:nth-child(2){top:26px}
+
+  /* LUXENY с подписью — по центру и чуть выше середины, крупно */
+  .hero__content{
+    align-items:flex-start;justify-content:center;
+    padding:calc(var(--nav-h) + clamp(34px,8vh,104px)) var(--pad) 0;
+  }
+  .hero__title-wrap{max-width:100%;text-align:center}
+  .hero__title{font-size:clamp(66px,13.6vw,150px);letter-spacing:.015em}
+  .hero__sub{font-size:clamp(12px,1.9vw,18px);letter-spacing:.22em;text-indent:.22em}
+}
+
+@media (max-width:900px){
+  .sec-head{grid-template-columns:1fr}
+  .sec-head__idx{padding-bottom:0}
+  .sec-head__title,.sec-head__note{grid-column:1}
+
+  /* трейлер: колонка заголовков не помещается — убираем, заголовок уходит в карточку */
+  .reel__grid{grid-template-columns:1fr}
+  .reel__aside{display:none}
+  .reel{padding:clamp(110px,20vh,240px) 0 clamp(40px,6vh,90px)}
+  .reel__cards{gap:clamp(52px,12vh,120px);padding-bottom:clamp(90px,22vh,220px)}
+
+  .award__lead{text-align:left;margin-inline:0}
+  .award__lead .case__text{margin-inline:0}
+  .award__body{grid-template-columns:1fr;gap:12px}
+  .pill{padding:4px 16px 4px 4px;gap:9px}
+  .proj{grid-template-columns:1fr;gap:22px}
+  .case--flip .proj .deck-wrap{order:0}
+  .fan{max-width:560px;margin-inline:auto}
+  .case__arrow{
+    top:auto;bottom:calc(var(--lift) * .18);transform:none;
+    width:20px;height:34px;opacity:.6;
+  }
+  .case__arrow--prev{left:0}
+  .case__arrow--next{right:0}
+
+  .contact__grid{grid-template-columns:1fr;justify-items:start}
+  /* на узком экране QR уходит под ссылки: сначала обращение и контакты */
+  .contact__qr{justify-self:center;width:min(72vw,300px);margin-top:clamp(8px,2vh,20px)}
+
+}
+
+@media (max-width:640px){
+  :root{--nav-h:64px}
+  .hero{height:270vh}
+  /* на телефоне заголовок сверху по центру */
+  .hero__content{
+    padding:calc(var(--nav-h) + clamp(26px,7vh,86px)) var(--pad) 0;
+  }
+  /* на узком экране заголовок упирается в поля — считаем размер от ширины,
+     а не от фиксированного минимума, иначе «LUXENY» вылезает за край */
+  .hero__title{font-size:min(17.6vw,116px);letter-spacing:.012em}
+  .hero__sub{font-size:clamp(11px,3.1vw,15px);letter-spacing:.18em;text-indent:.18em}
+  .hero__quote{
+    width:min(32ch,86vw);
+    bottom:clamp(40px,8vh,72px);
+    line-height:1.55;
+  }
+  .hero__quote::before{width:30px;margin-bottom:12px}
+
+  .rc__fig--word{font-size:clamp(19px,5.6vw,26px)}
+  .contact__links a{grid-template-columns:1fr auto;gap:4px 14px}
+  .contact__label{grid-column:1;grid-row:1}
+  .contact__value{grid-column:1;grid-row:2}
+  .contact__links svg{grid-column:2;grid-row:1/3}
+}
+
+/* ── REDUCED MOTION ─────────────────────────────────────────── */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .hero{height:100vh}
+  .hero__stage{position:relative}
+  .hero__hint-line{animation:none;transform:scaleY(1)}
+  .is-ready .hero__title .ch{animation:none;opacity:1;transform:none;filter:none}
+  .hero__sub{opacity:1;transform:none;transition:none}
+  .hero__hint-in{opacity:1}
+  .hero__quote{opacity:1;--ql:1}
+  .hero__quote .w{opacity:1;transform:none;filter:none}
+  .reveal{opacity:1;transform:none;transition:none}
+  .disp__line > span{transform:none;transition:none}
+  .sec-head--display .sec-head__idx{opacity:1;transition:none}
+  .case__dl::before{animation:none;opacity:0}
+  .cover__img{transform:translate3d(-50%,-50%,0) scale(1)}
+  .reel__aside{position:static;transform:none}
+  .rc{opacity:1!important;transform:none!important}
+  .combo__item{transition:none}
+  .lb,.lb__stage{transition:none}
+  .skills::before,.skills::after{animation:none}
+  .pill{opacity:1;transform:none;filter:none;transition:none;transition-delay:0s}
+  .pill::before,.pill::after{display:none}
+  .contact__qr.reveal{opacity:1;transform:none;filter:none;transition:none}
+  .contact__qr::before{animation:none}
+  .contact__qr.in .contact__qr-card{animation:none}
+  .contact__qr.in .contact__qr-card::after{animation:none}
+}

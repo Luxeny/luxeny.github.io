@@ -1,0 +1,9 @@
+# установщик лежит в GitHub Releases, а не в репозитории
+assets/work/pngtube/*.exe
+
+# служебное
+.claude/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
