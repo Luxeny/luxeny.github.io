@@ -98,9 +98,12 @@
     window.removeEventListener('pointerdown', unlock);
   };
   window.addEventListener('touchstart', unlock, { once: true, passive: true });
-  window.addEventListener('pointerdown', unlock, { once: true });
+  window.addEventListener('pointerdown', unlock, { once: true, passive: true });
 
   /* ── 4. Скраб по скроллу ──────────────────────────────────── */
+  const nav = $('nav');
+  let scrim = false;
+
   const TEXT_OUT  = 0.055;  /* LUXENY исчезает почти сразу */
   const HINT_OUT  = 0.035;
   const VEIL_IN   = 0.94;   /* подстраховка стыка с чёрной секцией */
@@ -111,14 +114,40 @@
   const Q_OUT     = 0.74;   /* начало растворения */
   const Q_GONE    = 0.88;   /* цитата растворилась полностью */
 
+  /* Телефоны и слабые машины: blur() по кадру — самая дорогая часть скраба.
+     Фильтр пересчитывается и для заголовка, и для каждого слова цитаты,
+     то есть под два десятка раз за кадр. Там, где это дорого, оставляем
+     только прозрачность и сдвиг: их считает видеоядро, а не процессор. */
+  const LOWFX =
+    matchMedia('(max-width: 900px), (pointer: coarse)').matches ||
+    (navigator.hardwareConcurrency || 8) <= 4;
+  if (LOWFX) document.documentElement.classList.add('lowfx');
+
   let cur = 0, tgt = 0, lastSet = -1, lastP = -1, lastActive = 0;
 
+  /* Пишем в style только то, что действительно изменилось: повторная запись
+     того же значения всё равно стоит браузеру пересчёта стилей, а таких
+     записей здесь по несколько десятков на кадр. */
+  const wrote = new WeakMap();
+  const put = (el, prop, val) => {
+    let m = wrote.get(el);
+    if (!m) { m = Object.create(null); wrote.set(el, m); }
+    if (m[prop] === val) return;
+    m[prop] = val;
+    if (prop.charCodeAt(0) === 45) el.style.setProperty(prop, val);
+    else el.style[prop] = val;
+  };
+
+  /* в ролике 24 кадра в секунду — искать время точнее одного кадра незачем,
+     декодер всё равно покажет тот же самый кадр */
+  const VFRAME = 1 / 24;
   const seek = (t) => {
-    if (Math.abs(t - lastSet) < 1 / 60) return;
-    lastSet = t;
+    const q = Math.round(t / VFRAME) * VFRAME;
+    if (q === lastSet) return;
+    lastSet = q;
     try {
-      if (typeof video.fastSeek === 'function') video.fastSeek(t);
-      else video.currentTime = t;
+      if (typeof video.fastSeek === 'function') video.fastSeek(q);
+      else video.currentTime = q;
     } catch (_) { /* seek до готовности — игнорируем */ }
   };
 
@@ -126,9 +155,18 @@
     /* --- читаем --- */
     const rect = hero.getBoundingClientRect();
     const vh   = window.innerHeight;
+    let busy = false;                    /* кому-то ещё нужны кадры */
+
+    /* затемнение под шапкой считаем здесь же: прямоугольник героя уже
+       прочитан, отдельный слушатель scroll читал бы его второй раз */
+    if (nav) {
+      const past = rect.bottom < vh * 0.5;
+      if (past !== scrim) { scrim = past; nav.classList.toggle('nav--scrim', past); }
+    }
 
     /* пока герой далеко от экрана — не трогаем ни видео, ни стили */
     if (rect.bottom > -vh && rect.top < vh) {
+      busy = true;
       const range = hero.offsetHeight - vh;
       const p     = range > 0 ? clamp(-rect.top / range) : 0;
 
@@ -137,28 +175,34 @@
       const vIn   = clamp((p - VEIL_IN) / (1 - VEIL_IN));
 
       /* --- пишем --- */
-      content.style.opacity   = String(1 - fade);
-      content.style.transform = `translate3d(0,${(-fade * 46).toFixed(2)}px,0)`;
-      content.style.filter    = fade > 0.002 ? `blur(${(fade * 14).toFixed(2)}px)` : 'none';
-      if (hint) hint.style.opacity = String(1 - hFade);
-      veil.style.opacity = String(vIn);
+      put(content, 'opacity', String(1 - fade));
+      put(content, 'transform', `translate3d(0,${(-fade * 46).toFixed(2)}px,0)`);
+      if (!LOWFX) {
+        put(content, 'filter', fade > 0.002 ? `blur(${(fade * 14).toFixed(2)}px)` : 'none');
+      }
+      if (hint) put(hint, 'opacity', String(1 - hFade));
+      put(veil, 'opacity', String(vIn));
 
       /* цитата: слова выкладываются одно за другим, затем блок растворяется */
       if (words.length && Math.abs(p - lastP) > 0.0004) {
         lastP = p;
         const out = 1 - clamp((p - Q_OUT) / (Q_GONE - Q_OUT));
-        quote.style.opacity = String(out);
-        quote.style.filter  = out < 0.999 ? `blur(${((1 - out) * 9).toFixed(2)}px)` : 'none';
+        put(quote, 'opacity', String(out));
+        if (!LOWFX) {
+          put(quote, 'filter', out < 0.999 ? `blur(${((1 - out) * 9).toFixed(2)}px)` : 'none');
+        }
         if (out > 0) {
           /* черта прочерчивается чуть раньше первого слова */
-          quote.style.setProperty('--ql', clamp((p - Q_IN + 0.035) / Q_RAMP).toFixed(3));
+          put(quote, '--ql', clamp((p - Q_IN + 0.035) / Q_RAMP).toFixed(3));
           const step = Q_SPAN / words.length;
           for (let i = 0; i < words.length; i++) {
             const a = clamp((p - (Q_IN + i * step)) / Q_RAMP);
             const w = words[i];
-            w.style.opacity   = String(a);
-            w.style.transform = `translateY(${((1 - a) * 0.4).toFixed(3)}em)`;
-            w.style.filter    = a > 0.995 ? 'none' : `blur(${((1 - a) * 7).toFixed(2)}px)`;
+            put(w, 'opacity', String(a));
+            put(w, 'transform', `translateY(${((1 - a) * 0.4).toFixed(3)}em)`);
+            if (!LOWFX) {
+              put(w, 'filter', a > 0.995 ? 'none' : `blur(${((1 - a) * 7).toFixed(2)}px)`);
+            }
           }
         }
       }
@@ -178,9 +222,9 @@
     if (reelItems.length && !reduced) {
       const box = reelCards.getBoundingClientRect();
       if (box.bottom < -vh || box.top > vh * 1.6) {   /* трейлер далеко — не считаем */
-        requestAnimationFrame(frame);
-        return;
+        return schedule(busy);
       }
+      busy = true;
       const shift = Math.min(200, window.innerWidth * 0.26);
       const ease  = (t) => t * t * (3 - 2 * t);       /* мягкий разгон и торможение */
       let best = 0, bestD = Infinity, lastEx = 0;
@@ -201,20 +245,20 @@
         const y = (1 - en) * 28 - ex * 95;
         const rot = (1 - en) * 2.2 - ex * 2.2;
 
-        el.style.opacity   = ((0.1 + en * 0.9) * (1 - ex)).toFixed(3);
-        el.style.transform =
-          `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) rotate(${rot.toFixed(2)}deg)`;
+        put(el, 'opacity', ((0.1 + en * 0.9) * (1 - ex)).toFixed(3));
+        put(el, 'transform',
+          `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) rotate(${rot.toFixed(2)}deg)`);
         /* свет разгорается к центру и гаснет по краям */
-        el.style.setProperty('--glow', clamp(1 - Math.abs(c - 0.5) * 2.4).toFixed(3));
+        put(el, '--glow', clamp(1 - Math.abs(c - 0.5) * 2.4).toFixed(3));
         if (i === reelItems.length - 1) lastEx = ex;
       }
 
       /* колонка слева уходит влево вместе с последней карточкой */
       if (reelAside) {
-        reelAside.style.opacity = (1 - lastEx).toFixed(3);
-        reelAside.style.transform =
-          `translateY(-50%) translateX(${(-lastEx * 110).toFixed(1)}px)`;
-        reelAside.style.pointerEvents = lastEx > 0.6 ? 'none' : 'auto';
+        put(reelAside, 'opacity', (1 - lastEx).toFixed(3));
+        put(reelAside, 'transform',
+          `translateY(-50%) translateX(${(-lastEx * 110).toFixed(1)}px)`);
+        put(reelAside, 'pointerEvents', lastEx > 0.6 ? 'none' : 'auto');
       }
 
       if (best !== lastActive) {
@@ -225,28 +269,45 @@
       }
     }
 
+    return schedule(busy);
+  };
+
+  /* ── 5. Цикл не крутится вхолостую ─────────────────────────
+     Раньше он до конца сеанса дважды за кадр дёргал
+     getBoundingClientRect — на телефоне это отнимало кадры даже внизу
+     страницы, где ни героя, ни трейлера давно нет. Теперь, когда считать
+     нечего, цикл засыпает и просыпается от скролла. */
+  let running = false;
+  const schedule = (busy) => {
+    if (busy) requestAnimationFrame(frame);
+    else running = false;
+  };
+  const kick = () => {
+    if (running || reduced) return;
+    running = true;
     requestAnimationFrame(frame);
   };
 
   if (!reduced) {
-    requestAnimationFrame(frame);
+    kick();
+    addEventListener('scroll', kick, { passive: true });
+    addEventListener('resize', kick);
+    addEventListener('orientationchange', kick);
   } else {
+    /* режим «меньше движения»: скраба нет, но затемнение под шапкой
+       всё равно нужно — считаем его по скроллу, как раньше */
     veil.style.opacity = '0';
-  }
-
-  /* ── 5. Затемнение под шапкой, когда герой позади ──────────── */
-  const nav = $('nav');
-  if (nav) {
-    let scrim = false;
-    const syncScrim = () => {
-      const past = hero.getBoundingClientRect().bottom < window.innerHeight * 0.5;
-      if (past === scrim) return;
-      scrim = past;
-      nav.classList.toggle('nav--scrim', past);
-    };
-    addEventListener('scroll', syncScrim, { passive: true });
-    addEventListener('resize', syncScrim);
-    syncScrim();
+    if (nav) {
+      const syncScrim = () => {
+        const past = hero.getBoundingClientRect().bottom < window.innerHeight * 0.5;
+        if (past === scrim) return;
+        scrim = past;
+        nav.classList.toggle('nav--scrim', past);
+      };
+      addEventListener('scroll', syncScrim, { passive: true });
+      addEventListener('resize', syncScrim);
+      syncScrim();
+    }
   }
 
   /* ── 6. Логотип возвращает наверх ─────────────────────────── */
