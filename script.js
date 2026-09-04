@@ -12,6 +12,7 @@
   const veil    = $('heroVeil');
   const content = $('heroContent');
   const hint    = $('heroHint');
+  const scrollBtn = $('heroScroll');
   const loader  = $('heroLoader');
   const title   = $('heroTitle');
   const quote   = $('heroQuote');
@@ -201,6 +202,9 @@
         put(content, 'filter', fade > 0.002 ? `blur(${(fade * 14).toFixed(2)}px)` : 'none');
       }
       if (hint) put(hint, 'opacity', String(1 - hFade));
+      /* подсказка растворилась — кнопка не должна ни ловить нажатия,
+         ни попадаться на пути Tab. visibility снимает и то, и другое */
+      if (scrollBtn) put(scrollBtn, 'visibility', hFade > 0.92 ? 'hidden' : 'visible');
       put(veil, 'opacity', String(vIn));
 
       /* цитата: слова выкладываются одно за другим, затем блок растворяется */
@@ -415,6 +419,68 @@
     nums.forEach((el) => numIO.observe(el));
   } else {
     nums.forEach(runNum);
+  }
+
+  /* ── 9. Кнопка Scroll: страница едет сама ──────────────────────
+     Нажатие пускает страницу вниз с тем же темпом, с каким ролик в герое
+     идёт при обычном воспроизведении: длина прокрутки героя за его
+     длительность. Любое действие пользователя — колесо, касание,
+     клавиша — сразу забирает управление обратно. */
+  const STOP_ON = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
+
+  if (scrollBtn) {
+    let raf = 0, prev = 0, speed = 280;
+
+    const stopAuto = () => {
+      if (!raf) return;
+      cancelAnimationFrame(raf);
+      raf = 0;
+      scrollBtn.setAttribute('aria-pressed', 'false');
+      document.documentElement.classList.remove('is-autoscroll');
+      STOP_ON.forEach((t) => removeEventListener(t, bail));
+    };
+
+    /* События самой кнопки вмешательством не считаются: у неё свой
+       обработчик, иначе повторное нажатие сначала остановило бы прокрутку,
+       а следом тут же запустило её заново. */
+    function bail(e) {
+      const t = e.target;
+      const own = e.type === 'keydown'
+        ? document.activeElement === scrollBtn
+        : t instanceof Node && scrollBtn.contains(t);
+      if (!own) stopAuto();
+    }
+
+    const step = (now) => {
+      const dt  = Math.min(0.05, (now - prev) / 1000);   /* вкладка спала — не прыгаем */
+      prev = now;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const y   = Math.min(window.scrollY + speed * dt, max);
+      window.scrollTo(0, y);
+      if (y >= max - 1) { stopAuto(); return; }          /* низ страницы */
+      raf = requestAnimationFrame(step);
+    };
+
+    const startAuto = () => {
+      const range = hero.offsetHeight - window.innerHeight;
+      speed = duration > 0 && range > 0 ? clamp(range / duration, 190, 430) : 280;
+      prev  = performance.now();
+      scrollBtn.setAttribute('aria-pressed', 'true');
+      document.documentElement.classList.add('is-autoscroll');
+      STOP_ON.forEach((t) => addEventListener(t, bail, { passive: true }));
+      raf = requestAnimationFrame(step);
+    };
+
+    scrollBtn.addEventListener('click', () => {
+      if (reduced) {
+        /* движение выключено в системе — везти страницу самим незачем,
+           просто переходим к первому разделу */
+        const about = document.getElementById('about');
+        if (about) about.scrollIntoView();
+        return;
+      }
+      if (raf) stopAuto(); else startAuto();
+    });
   }
 
   /* ── 10. Необязательные картинки: нет файла — остаётся заглушка ─ */

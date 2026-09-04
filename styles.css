@@ -324,6 +324,38 @@ picture{display:contents}
   opacity:0;
 }
 .is-ready .hero__hint-in{transition:opacity 1s var(--ease) 1.3s;opacity:1}
+/* мышь с колесом — она же кнопка автопрокрутки. Вся подсказка не ловит
+   курсор, поэтому клики разрешаем точечно, только кнопке */
+.hero__scroll{
+  pointer-events:auto;
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+  margin:0;padding:4px 10px 2px;
+  border:0;background:none;cursor:pointer;
+  color:rgba(255,255,255,.66);
+  /* кадр под подсказкой то тёмный, то светлый песок — тонкая обводка
+     мыши на нём терялась. Тень держит и значок, и подпись */
+  filter:drop-shadow(0 2px 10px rgba(0,0,0,.8));
+  transition:color .35s var(--ease),transform .45s var(--ease);
+}
+.hero__scroll:hover,
+.hero__scroll:focus-visible{color:rgba(255,255,255,.92)}
+.hero__scroll:focus-visible{outline:1px solid rgba(255,255,255,.5);outline-offset:6px;border-radius:14px}
+.hero__scroll:active{transform:translateY(1px)}
+.hero__scroll-mouse{width:clamp(19px,1.6vw,23px);height:auto;display:block}
+/* колёсико катится вниз и гаснет — тот же жест, что просят от страницы */
+.hero__scroll-wheel{
+  animation:wheelRoll 2.4s var(--ease) infinite;
+  transform-box:fill-box;transform-origin:50% 0;
+}
+@keyframes wheelRoll{
+  0%  {transform:translateY(0);opacity:0}
+  18% {opacity:1}
+  62% {transform:translateY(6px);opacity:0}
+  100%{transform:translateY(6px);opacity:0}
+}
+/* пока страница едет сама, плавная прокрутка из CSS только мешала бы:
+   каждый шаг цикла она разгоняла бы отдельной анимацией */
+html.is-autoscroll{scroll-behavior:auto}
 .hero__hint-label{
   font-size:9.5px;letter-spacing:.42em;text-transform:uppercase;
   color:rgba(255,255,255,.5);
@@ -1545,6 +1577,7 @@ html.is-locked .nav{padding-right:calc(var(--pad) + var(--sbw,0px))}
   .hero{height:100vh}
   .hero__stage{position:relative}
   .hero__hint-line{animation:none;transform:scaleY(1)}
+  .hero__scroll-wheel{animation:none;opacity:1}
   .is-ready .hero__title .ch{animation:none;opacity:1;transform:none;filter:none}
   .hero__sub{opacity:1;transform:none;transition:none}
   .hero__hint-in{opacity:1}
