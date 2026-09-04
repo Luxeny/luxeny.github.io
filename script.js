@@ -51,9 +51,21 @@
   }
 
   /* ── 3. Загрузка видео ────────────────────────────────────── */
-  const source = matchMedia('(max-width: 820px)').matches
-    ? 'assets/hero-1100.mp4'
-    : 'assets/hero-1920.mp4';
+  /* Три варианта ролика. Отдельный вертикальный нужен телефону: широкий
+     кадр в узком окне object-fit: cover растягивал впятеро и превращал
+     в мыло — от исходника оставалась полоска в 220px по ширине.
+     У вертикального обрезка сделана заранее, по высоте кадра. */
+  const portrait = matchMedia('(max-width: 900px) and (max-aspect-ratio: 3/4)').matches;
+  const source = portrait
+    ? 'assets/hero-portrait.mp4'
+    : matchMedia('(max-width: 820px)').matches
+      ? 'assets/hero-1100.mp4'
+      : 'assets/hero-1920.mp4';
+
+  /* постер под тот же кадр; в разметке его нет, иначе телефон тянул бы
+     обе картинки — нужную и широкую */
+  video.poster = portrait ? 'assets/poster-portrait.jpg' : 'assets/poster.jpg';
+  if (portrait) video.classList.add('hero__video--portrait');
 
   let duration = 0;
   let ready    = false;
@@ -141,10 +153,18 @@
   /* в ролике 24 кадра в секунду — искать время точнее одного кадра незачем,
      декодер всё равно покажет тот же самый кадр */
   const VFRAME = 1 / 24;
+  let seekAt = 0;
   const seek = (t) => {
     const q = Math.round(t / VFRAME) * VFRAME;
     if (q === lastSet) return;
+    /* Предыдущая перемотка ещё идёт: запрос поверх неё декодер отрабатывает
+       рывком, и на телефоне это главный источник дёрганья. Пропускаем кадр —
+       следующий возьмёт уже более свежее значение, движение не отстанет.
+       Четверть секунды — потолок ожидания: если декодер почему-то завис на
+       seeking, лучше отправить новый запрос, чем встать намертво. */
+    if (video.seeking && performance.now() - seekAt < 260) return;
     lastSet = q;
+    seekAt = performance.now();
     try {
       if (typeof video.fastSeek === 'function') video.fastSeek(q);
       else video.currentTime = q;

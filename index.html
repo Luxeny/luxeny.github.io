@@ -58,8 +58,12 @@
      показывает системный шрифт, поэтому ждать этот запрос незачем -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter+Tight:wght@200;300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter+Tight:wght@200;300;400;500;600;700&display=swap"></noscript>
-<link rel="preload" as="image" href="assets/poster.jpg" fetchpriority="high">
-<link rel="stylesheet" href="styles.css?v=2">
+<!-- постер под ориентацию: телефон в портрете тянет вертикальный кадр -->
+<link rel="preload" as="image" href="assets/poster-portrait.jpg" fetchpriority="high"
+      media="(max-width: 900px) and (max-aspect-ratio: 3/4)">
+<link rel="preload" as="image" href="assets/poster.jpg" fetchpriority="high"
+      media="(min-aspect-ratio: 3/4), (min-width: 901px)">
+<link rel="stylesheet" href="styles.css?v=3">
 
 <script type="application/ld+json">
 {
@@ -179,7 +183,7 @@
 
     <video class="hero__video" id="heroVideo"
            muted playsinline webkit-playsinline preload="auto"
-           poster="assets/poster.jpg" disablepictureinpicture
+           disablepictureinpicture
            aria-hidden="true" tabindex="-1"></video>
 
     <div class="hero__grade" aria-hidden="true"></div>
@@ -661,6 +665,6 @@
   </figure>
 </div>
 
-<script src="script.js?v=2"></script>
+<script src="script.js?v=3"></script>
 </body>
 </html>

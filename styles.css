@@ -16,6 +16,15 @@
   --ease:cubic-bezier(.22,.61,.36,1);
   --lift:clamp(84px,10vw,132px);   /* воздух над колодой и вокруг главы */
   --r-card:clamp(9px,.75vw,14px); /* скругление у всех карточек с картинками */
+
+  /* Высота панели браузера, которая на телефоне уезжает при прокрутке.
+     Сцена героя держит полную высоту окна (100lvh), а всё, что прижато
+     к её низу, поднимаем на эту величину — иначе в самом начале, пока
+     панель ещё на экране, подписи оказываются под ней. */
+  --vchrome:0px;
+}
+@supports (height:100lvh){
+  :root{--vchrome:calc(100lvh - 100svh)}
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -183,7 +192,10 @@ picture{display:contents}
 }
 .hero__stage{
   position:sticky;top:0;
-  height:100vh;height:100svh;
+  /* 100lvh, а не svh: сцена должна закрывать экран и после того, как
+     панель браузера уехала, иначе снизу открывается чёрная полоса */
+  height:100vh;
+  height:100lvh;
   overflow:hidden;
   background:var(--black);
 }
@@ -197,6 +209,8 @@ picture{display:contents}
 @media (max-aspect-ratio:1/1){
   .hero__video{object-position:66% 50%}
 }
+/* вертикальный ролик обрезан по кадру заранее — смещать его не нужно */
+.hero__video--portrait{object-position:50% 50%}
 
 /* кинематографичная подложка: виньетка + затемнение под меню */
 .hero__grade{
@@ -266,7 +280,8 @@ picture{display:contents}
 
 /* — цитата, проявляется по словам вместе с видео — */
 .hero__quote{
-  position:absolute;left:var(--pad);bottom:clamp(54px,11vh,104px);
+  position:absolute;left:var(--pad);
+  bottom:calc(clamp(54px,11vh,104px) + var(--vchrome));
   margin:0;
   width:min(38ch,44vw);
   font-size:clamp(15px,1.42vw,23px);
@@ -298,7 +313,8 @@ picture{display:contents}
 
 /* — подсказка Scroll — */
 .hero__hint{
-  position:absolute;left:50%;bottom:clamp(22px,3.4vh,44px);
+  position:absolute;left:50%;
+  bottom:calc(clamp(22px,3.4vh,44px) + var(--vchrome));
   transform:translateX(-50%);
   pointer-events:none;
 }
@@ -876,15 +892,17 @@ picture{display:contents}
   content:"";position:absolute;inset:0;pointer-events:none;
   /* затемнение только снизу: картинка уходит в фон страницы и держит
      подпись, а сверху начинается сразу от линии раздела, в полную силу */
+  /* к нижнему краю затемнение доходит до плотного чёрного заранее:
+     иначе под названием оставалась светлая полоска фотографии */
   background:linear-gradient(180deg,
     rgba(0,0,0,0)     0%,
-    rgba(0,0,0,0)    44%,
-    rgba(0,0,0,.08)  53%,
-    rgba(0,0,0,.20)  63%,
-    rgba(0,0,0,.38)  73%,
-    rgba(0,0,0,.58)  81%,
-    rgba(0,0,0,.78)  88%,
-    rgba(0,0,0,.93)  95%,
+    rgba(0,0,0,0)    40%,
+    rgba(0,0,0,.10)  50%,
+    rgba(0,0,0,.26)  60%,
+    rgba(0,0,0,.46)  69%,
+    rgba(0,0,0,.70)  77%,
+    rgba(0,0,0,.90)  84%,
+    var(--black)     91%,
     var(--black)    100%);
 }
 .cover__title{
@@ -1151,8 +1169,11 @@ picture{display:contents}
   border-top:1px solid var(--line);
 }
 .contact__grid{
-  display:grid;grid-template-columns:1.3fr 1fr;
-  gap:clamp(34px,6vw,110px);align-items:center;
+  display:grid;
+  /* колонка QR фиксированной ширины, остальное отдаём строкам контактов:
+     при долях справа от «Telegram» и «Почты» оставалось пустое поле */
+  grid-template-columns:1fr clamp(210px,24vw,330px);
+  gap:clamp(34px,5vw,86px);align-items:center;
 }
 .contact__title{
   margin:0 0 clamp(30px,4vw,52px);
@@ -1164,7 +1185,7 @@ picture{display:contents}
 .contact__links li:last-child{border-bottom:1px solid var(--line)}
 .contact__links a{
   display:grid;grid-template-columns:110px 1fr auto;align-items:center;gap:16px;
-  padding:clamp(16px,2vw,24px) 0;
+  padding:clamp(18px,2.2vw,28px) 0;
   transition:padding-left .45s var(--ease);
 }
 .contact__links a:hover{padding-left:12px}
@@ -1172,7 +1193,8 @@ picture{display:contents}
   font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute-2);
 }
 .contact__value{
-  font-size:clamp(16px,1.7vw,24px);font-weight:400;color:#fff;
+  font-size:clamp(17px,2vw,28px);font-weight:400;color:#fff;
+  letter-spacing:-.01em;
 }
 .contact__links svg{width:20px;height:20px;color:rgba(255,255,255,.35);transition:color .45s var(--ease)}
 .contact__links a:hover svg{color:#fff}
@@ -1181,7 +1203,7 @@ picture{display:contents}
 .contact__qr{
   position:relative;
   justify-self:end;align-self:center;
-  width:min(100%,clamp(210px,24vw,330px));
+  width:100%;
   aspect-ratio:1/1;
   /* сцена для покачивания: без перспективы поворот читался бы плоским */
   perspective:900px;
@@ -1396,7 +1418,9 @@ html.is-locked .nav{padding-right:calc(var(--pad) + var(--sbw,0px))}
   .case__arrow--prev{left:0}
   .case__arrow--next{right:0}
 
-  .contact__grid{grid-template-columns:1fr;justify-items:start}
+  /* одна колонка: строки контактов тянутся во всю ширину экрана,
+     иначе справа от них остаётся пустое поле */
+  .contact__grid{grid-template-columns:1fr}
   /* на узком экране QR уходит под ссылки: сначала обращение и контакты */
   .contact__qr{justify-self:center;width:min(72vw,300px);margin-top:clamp(8px,2vh,20px)}
 
@@ -1415,7 +1439,7 @@ html.is-locked .nav{padding-right:calc(var(--pad) + var(--sbw,0px))}
   .hero__sub{font-size:clamp(11px,3.1vw,15px);letter-spacing:.18em;text-indent:.18em}
   .hero__quote{
     width:min(32ch,86vw);
-    bottom:clamp(40px,8vh,72px);
+    bottom:calc(clamp(40px,8vh,72px) + var(--vchrome));
     line-height:1.55;
   }
   .hero__quote::before{width:30px;margin-bottom:12px}
@@ -1472,7 +1496,7 @@ html.is-locked .nav{padding-right:calc(var(--pad) + var(--sbw,0px))}
   .hero__sub{font-size:clamp(10px,1.4vw,13px)}
   .hero__quote{
     width:min(34ch,42vw);
-    bottom:clamp(18px,5vh,34px);
+    bottom:calc(clamp(18px,5vh,34px) + var(--vchrome));
     font-size:clamp(12px,1.5vw,15px);
     line-height:1.45;
   }
