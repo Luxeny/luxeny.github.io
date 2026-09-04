@@ -686,6 +686,9 @@ picture{display:contents}
   z-index:var(--z,1);
   box-shadow:0 26px 60px rgba(0,0,0,.72);
   overflow:hidden;
+  /* та же подложка, что у остальных карточек: пока картинка летит,
+     в рамке должен быть кадр, а не дырка в фон страницы */
+  background:#0a0c10;
   transition:transform .55s var(--ease),box-shadow .55s var(--ease),opacity .45s var(--ease);
 }
 .combo__item img{width:100%;height:auto;display:block}

@@ -423,7 +423,29 @@
     if (img.complete && img.naturalWidth === 0) img.remove();
   });
 
-  /* ── 11. Колода карточек ───────────────────────────────────── */
+  /* ── 11. Кадры главы подгружаются заранее ──────────────────
+     loading="lazy" будит загрузку, когда картинка уже почти на экране.
+     Глава при этом успевает проявиться раньше файлов, и коллаж
+     показывает пустые рамки. Своим наблюдателем начинаем грузить
+     за два с половиной экрана до главы: это та же ленивая загрузка,
+     только с запасом — кадры дальних глав по-прежнему не трогаются.
+     Запас нужен ещё и потому, что кадры главы уходят в сеть пачкой:
+     у «Контента» их пятнадцать, и коллаж наград, идущий следом,
+     иначе ждёт, пока они поделят канал. */
+  if ('IntersectionObserver' in window) {
+    const warm = new IntersectionObserver((entries, obs) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        obs.unobserve(e.target);
+        e.target.querySelectorAll('img[loading="lazy"]').forEach((img) => {
+          img.loading = 'eager';
+        });
+      });
+    }, { rootMargin: '250% 0px' });
+    document.querySelectorAll('.case').forEach((el) => warm.observe(el));
+  }
+
+  /* ── 12. Колода карточек ───────────────────────────────────── */
   document.querySelectorAll('[data-deck]').forEach((deck) => {
     const cards = [...deck.children];
     const wrap  = deck.parentElement;
@@ -795,7 +817,7 @@
     });
   });
 
-  /* ── 12. Листалка проектов внутри главы ────────────────────── */
+  /* ── 13. Листалка проектов внутри главы ────────────────────── */
   document.querySelectorAll('[data-pager]').forEach((pager) => {
     const slides = [...pager.querySelector('.pager__track').children];
     const box    = pager.closest('.case') || pager.parentElement;
@@ -986,7 +1008,7 @@
     });
   }
 
-  /* ── 13. Появление блоков ──────────────────────────────────── */
+  /* ── 14. Появление блоков ──────────────────────────────────── */
   const items = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window && !reduced) {
     const io = new IntersectionObserver((entries) => {
