@@ -920,6 +920,9 @@
         sl.style.setProperty('--b',  here ? '0px' : '7px');
         sl.style.setProperty('--pe', here ? 'auto' : 'none');
         sl.setAttribute('aria-hidden', here ? 'false' : 'true');
+        /* одного aria-hidden мало: стрелки и точки убранного проекта
+           оставались в обходе по Tab, и фокус уезжал на невидимое */
+        sl.inert = !here;
       });
     };
     render();

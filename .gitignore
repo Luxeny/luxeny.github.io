@@ -7,3 +7,6 @@ assets/work/pngtube/*.exe
 Thumbs.db
 desktop.ini
 *.log
+
+# подробные заметки по устройству сайта — только локально
+NOTES.local.md
