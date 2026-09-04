@@ -427,9 +427,12 @@
      длительность. Любое действие пользователя — колесо, касание,
      клавиша — сразу забирает управление обратно. */
   const STOP_ON = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
+  /* Темп автопрокрутки в долях от обычной скорости ролика: 1 — ровно
+     столько, сколько идёт видео, 1.5 — в полтора раза быстрее. */
+  const AUTO_RATE = 1;
 
   if (scrollBtn) {
-    let raf = 0, prev = 0, speed = 280;
+    let raf = 0, prev = 0, speed = 280, pos = 0;
 
     const stopAuto = () => {
       if (!raf) return;
@@ -455,16 +458,21 @@
       const dt  = Math.min(0.05, (now - prev) / 1000);   /* вкладка спала — не прыгаем */
       prev = now;
       const max = document.documentElement.scrollHeight - window.innerHeight;
-      const y   = Math.min(window.scrollY + speed * dt, max);
-      window.scrollTo(0, y);
-      if (y >= max - 1) { stopAuto(); return; }          /* низ страницы */
+      /* Позицию ведём сами, а не читаем обратно из scrollY: тот округляется
+         до целого пикселя, и дробный остаток шага каждый кадр пропадал.
+         На 120 Гц шаг 2.28px превращался в 2 — прокрутка отставала от
+         ролика на 12%, на 180 Гц наоборот убегала вперёд на 30%. */
+      pos = Math.min(pos + speed * dt, max);
+      window.scrollTo(0, pos);
+      if (pos >= max - 1) { stopAuto(); return; }        /* низ страницы */
       raf = requestAnimationFrame(step);
     };
 
     const startAuto = () => {
       const range = hero.offsetHeight - window.innerHeight;
-      speed = duration > 0 && range > 0 ? clamp(range / duration, 190, 430) : 280;
+      speed = (duration > 0 && range > 0 ? clamp(range / duration, 190, 430) : 280) * AUTO_RATE;
       prev  = performance.now();
+      pos   = window.scrollY;
       scrollBtn.setAttribute('aria-pressed', 'true');
       document.documentElement.classList.add('is-autoscroll');
       STOP_ON.forEach((t) => addEventListener(t, bail, { passive: true }));
