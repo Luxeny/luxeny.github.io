@@ -11,21 +11,21 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="color-scheme" content="dark">
 
-<!-- Политика безопасности. Всё своё, извне только шрифты Google.
-     Подключаете аналитику или ещё один внешний скрипт — допишите его домен
-     в script-src / connect-src / img-src, иначе браузер его заблокирует. -->
+<!-- Политика безопасности. Извне только шрифты Google и Яндекс.Метрика.
+     Подключаете ещё один внешний скрипт — допишите его домен в script-src /
+     connect-src / img-src, иначе браузер молча его заблокирует. -->
 <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
   base-uri 'self';
   object-src 'none';
   form-action 'self';
-  frame-src 'none';
-  script-src 'self' 'unsafe-hashes' 'sha256-1jAmyYXcRq6zFldLe/GCgIDJBiOONdXjTLgEFMDnDSM=';
+  frame-src https://mc.yandex.ru https://mc.yandex.com;
+  script-src 'self' 'unsafe-hashes' 'sha256-1jAmyYXcRq6zFldLe/GCgIDJBiOONdXjTLgEFMDnDSM=' https://mc.yandex.ru https://mc.yandex.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' https://fonts.gstatic.com;
-  img-src 'self' data:;
+  img-src 'self' data: https://mc.yandex.ru https://mc.yandex.com;
   media-src 'self';
-  connect-src 'self';
+  connect-src 'self' https://mc.yandex.ru https://mc.yandex.com;
   upgrade-insecure-requests">
 
 <!-- превью ссылки в Telegram, ВК, Discord, X -->
@@ -86,15 +86,10 @@
 }
 </script>
 
-<!-- ── Аналитика ────────────────────────────────────────────────
-     Бесплатно и без кук. Заведите проект на https://www.goatcounter.com
-     (или Cloudflare Web Analytics), подставьте свой код вместо ВАШ-КОД
-     и раскомментируйте блок. Не забудьте добавить домен счётчика
-     в script-src / connect-src / img-src в Content-Security-Policy выше.
+<!-- Счётчик Яндекс.Метрики. Номер счётчика и настройки — в самом файле;
+     пока он не вписан, скрипт ничего не делает и в сеть не ходит. -->
+<script src="assets/metrika.js?v=1" defer></script>
 
-<script data-goatcounter="https://ВАШ-КОД.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
-───────────────────────────────────────────────────────────────── -->
 </head>
 <body>
 
