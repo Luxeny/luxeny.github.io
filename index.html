@@ -25,7 +25,7 @@
   font-src 'self' https://fonts.gstatic.com;
   img-src 'self' data: https://mc.yandex.ru https://mc.yandex.com;
   media-src 'self';
-  connect-src 'self' https://mc.yandex.ru https://mc.yandex.com;
+  connect-src 'self' https://mc.yandex.ru https://mc.yandex.com wss://mc.yandex.ru wss://mc.yandex.com;
   upgrade-insecure-requests">
 
 <!-- превью ссылки в Telegram, ВК, Discord, X -->
@@ -86,9 +86,11 @@
 }
 </script>
 
-<!-- Счётчик Яндекс.Метрики. Номер счётчика и настройки — в самом файле;
-     пока он не вписан, скрипт ничего не делает и в сеть не ходит. -->
-<script src="assets/metrika.js?v=1" defer></script>
+<!-- Счётчик Яндекс.Метрики 112302487. Номер и настройки — в самом файле.
+     Пиксель в <noscript> считает тех, у кого выключен JS: скрипт до них
+     не доберётся, а картинка загрузится. -->
+<script src="assets/metrika.js?v=2" defer></script>
+<noscript><div><img src="https://mc.yandex.ru/watch/112302487" style="position:absolute;left:-9999px" alt=""></div></noscript>
 
 </head>
 <body>
